@@ -26,7 +26,7 @@ A soft-workflow plugin for [DeepSeek Harness](https://github.com/deepseek-ai/dee
 Edges can carry **any condition**, and flows can be sequential, parallel, joined, conditionally branched, looped or rolled back — the plugin ships no execution engine; everything is done by the model in your current session. Hand it any work you can draw as a step graph: multi-step coding jobs, research pipelines, content pipelines. Canvases with hundreds of steps still drag and pan at full frame rate.
 
 > [!TIP]
-> **Workflow packs**: [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) — ready-to-import `.wflite.zip` workflow packs; the "破甲制作" research pipeline is already up (see [📋 Available workflows](#-available-workflows) below).
+> **Workflow packs**: [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) — ready-to-import `.wflite.zip` workflow packs; the "破甲制作" research pipeline and the "pojia-fullflow" reverse-engineering full flow are already up (see [📋 Available workflows](#-available-workflows) below).
 
 > [!NOTE]
 > **Experimental**: features and data formats are still changing, and any release may include breaking changes.
@@ -40,8 +40,11 @@ Ready-made workflows live in the [Minglink/dsh-workflows](https://github.com/Min
 | Workflow | What it does | Download |
 |---|---|---|
 | **破甲制作** | Automated LLM jailbreak-research pipeline, 15 steps: **probe testing** (200+ probes across identity-system / hybrid-frame / lightweight architectures) → **refusal-pattern analysis** → **tailored jailbreak-prompt generation** → **API verification** → **three deliverables** (jailbreak prompts + usage manual with frame matrix and push-back prompt library + research report). Ships with the `jailbreak-research` Skill: 10 test scripts + 4 prompt templates | [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) |
+| **pojia-fullflow** | Reverse-engineering full flow, 10 steps and 32 edges: **demand intake → host assembly → routing → recon case → mapping / locating → patching → consolidation → self-review → delivery**, with three evidence-based branch points and one loop back to consolidation; covers 27 runbooks / 167 stages. **Requires the `pj_*` tools from the local `dsh-pojia-toolkit` plugin** | [pojia-fullflow.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/pojia-fullflow.wflite.zip) |
 
-## 🖼️ Example workflow
+## 🖼️ Example workflows
+
+### 破甲制作
 
 The "破甲制作" research pipeline on the canvas — 15 steps chained into one flow, with branches, loops and output files drawn right on the graph.
 
@@ -53,6 +56,16 @@ The "破甲制作" research pipeline on the canvas — 15 steps chained into one
     <td><img src="./assets/poyazhi-sidebar.webp" width="260" alt="Step library on the left: Basics, Common steps and My steps, dragged onto the canvas"></td>
   </tr>
 </table>
+
+### pojia-fullflow
+
+"pojia-fullflow" covers the whole reverse-engineering path: 10 steps and 32 edges on one main line, three evidence-based branches and one loop back to consolidation, driving a one-line request to a deliverable conclusion; each step's body is a task text ready to dispatch as is.
+
+![Full canvas of the pojia-fullflow workflow: demand intake, host assembly, routing, recon case, mapping, locating, patching, consolidation, self-review and delivery linked in sequence, branching after recon case, locating and self-review](./assets/pojia-canvas.webp)
+
+![Flow detail of pojia-fullflow: each card carries the step's task text, outputs, prerequisites and reads, with conditional edges labelled mapping / direct locate / direct consolidation, patch / no patch, and another round / deliver](./assets/pojia-flow.webp)
+
+Every step calls `pj_*` tools from `dsh-pojia-toolkit` (20 of them: routing, orchestration, case building, decompilation, byte patching, reporting). Without that local plugin the graph still draws, but no step runs; a prompt-only route is to lay out the same 10 steps yourself and use each step's task text as the prompt.
 
 ## 📦 Install
 

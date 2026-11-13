@@ -1346,6 +1346,9 @@ describe('statRunPath：大文件夹', () => {
       await writeFile(file, String(i))
       await utimes(file, base + i, base + i)
     }
+    // 文件夹自己的时间钉在一小时前：这之后加删都不一定动它（有些文件系统本来就是这么粗），
+    // 钉住才能稳定看到「只靠文件夹时间看不到、得看最近那几份」这条快路。
+    await utimes(dir, base, base)
     const first = await statRunPath(dir, 'folder')
     expect(first?.size).toBe(100)
     // 覆盖写最近的那份：文件夹自己的时间不变，报的修改时间跟着变。
@@ -1354,7 +1357,6 @@ describe('statRunPath：大文件夹', () => {
     expect(touched?.size).toBe(100)
     expect(touched?.mtime).toBeGreaterThan(first?.mtime ?? 0)
     // 加一份：项数和修改时间都跟着变。
-    await new Promise((resolve) => setTimeout(resolve, 20))
     await writeFile(join(dir, 'new.txt'), 'new')
     const added = await statRunPath(dir, 'folder')
     expect(added?.size).toBe(101)
@@ -1362,5 +1364,20 @@ describe('statRunPath：大文件夹', () => {
     // 删一份：项数跟着变。
     await rm(join(dir, 'f000.txt'))
     expect((await statRunPath(dir, 'folder'))?.size).toBe(100)
+  })
+
+  // 有些文件系统（这里就是）文件夹自己的时间只精确到秒，半秒内连删带加都不改它：
+  // 光看那个时间会把删掉、加进的一份漏掉，快路上要再数一遍项数。
+  it('文件夹自己的时间被钉住时，加一份、删一份照样看得到', async () => {
+    const pinned = new Date(Date.now() - 60_000)
+    await writeFile(join(dir, 'a.txt'), 'a')
+    await utimes(dir, pinned, pinned)
+    expect((await statRunPath(dir, 'folder'))?.size).toBe(1)
+    await writeFile(join(dir, 'b.txt'), 'b')
+    await utimes(dir, pinned, pinned)
+    expect((await statRunPath(dir, 'folder'))?.size).toBe(2)
+    await rm(join(dir, 'a.txt'))
+    await utimes(dir, pinned, pinned)
+    expect((await statRunPath(dir, 'folder'))?.size).toBe(1)
   })
 })

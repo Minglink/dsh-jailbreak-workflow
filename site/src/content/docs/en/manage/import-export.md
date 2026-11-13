@@ -38,6 +38,8 @@ A package is at most 200 MB and 5000 files, excluding `.git`, `node_modules` and
 
 On the **Workflows** page, click **Import** and choose a file, or drag a `.wflite.zip` onto the page. A list is shown first, and nothing is written until you confirm.
 
+Ready-made packs live in the [dsh-workflows](https://github.com/Minglink/dsh-workflows) collection — 破甲制作 and pojia-fullflow are up; download one and import it on the **Workflows** page as below.
+
 | Part | Content |
 |---|---|
 | Versions in the package | Which versions there are, and which version each becomes after import. |
