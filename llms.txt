@@ -1,6 +1,6 @@
 # dsh-jailbreak-workflow (@minglink/dsh-jailbreak-workflow)
 
-> Canvas → plan prompt → model execution. A soft-workflow plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness): design a flow on a visual canvas, compile it into one plan prompt, and let the model in the current session carry it out. No execution engine, no extra service — scheduling and judgement stay with the model. Ships with the ready-made「破甲制作」jailbreak-research pipeline (15 steps, 200+ probes, three deliverables) via the companion workflow pack collection.
+> Canvas → plan prompt → model execution. A soft-workflow plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness): design a flow on a visual canvas, compile it into one plan prompt, and let the model in the current session carry it out. No execution engine, no extra service — scheduling and judgement stay with the model. Ships ready-made packs through the companion collection: the「破甲制作」jailbreak-research pipeline (15 steps, 200+ probes, three deliverables) and the pojia-fullflow reverse-engineering full flow (10 steps, 32 edges).
 
 - Repository: https://github.com/Minglink/dsh-jailbreak-workflow
 - npm: https://www.npmjs.com/package/@minglink/dsh-jailbreak-workflow
@@ -29,6 +29,7 @@
 ## Workflow packs
 
 - [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) — automated LLM jailbreak-prompt research pipeline: probe testing (200+ probes across identity-system / hybrid-frame / lightweight architectures) → refusal-pattern analysis → tailored jailbreak-prompt generation → API verification → three deliverables (jailbreak prompt file, usage manual with frame matrix + push-back prompt library, research report). Includes the `jailbreak-research` skill: 10 test scripts + 4 prompt templates.
+- [pojia-fullflow.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/pojia-fullflow.wflite.zip) — reverse-engineering full flow: 10 steps and 32 edges (6 on the main chain, 6 conditional branches, 1 loop edge) covering 27 runbooks / 167 stages, from demand intake → host assembly → routing → recon case → mapping / locating → patching → consolidation → self-review → delivery. Requires the 20 `pj_*` tools from the local `dsh-pojia-toolkit` plugin, which needs IDA (idalib) and Frida for the engine-backed steps; the graph draws without it but no step runs. A prompt-only variant works by rebuilding the 10 steps and using each step's task text as its prompt.
 
 ## Optional
 

@@ -68,7 +68,9 @@ export function prepareShotsProfile(options) {
       {
         name: `dsh-profile-${name}`,
         private: true,
-        dependencies: { '@minglink/dsh-jailbreak-workflow': `link:${REPO_ROOT.replaceAll('\\', '/')}` },
+        dependencies: {
+          '@minglink/dsh-jailbreak-workflow': `link:${REPO_ROOT.replaceAll('\\', '/')}`,
+        },
         dsh: { profile: { bundles: SHOTS_BUNDLES, patchReload: 'startup' } },
       },
       null,

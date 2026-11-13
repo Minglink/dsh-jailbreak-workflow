@@ -38,6 +38,8 @@ sidebar:
 
 在「工作流」页点击「导入」，选择文件，或把 `.wflite.zip` 拖到页面上。先显示清单，确认后才写入。
 
+现成的包可在工作流合集 [dsh-workflows](https://github.com/Minglink/dsh-workflows) 下载，已上架「破甲制作」与「pojia-fullflow」，下载后在「工作流」页按下面的步骤导入。
+
 | 部分 | 内容 |
 |---|---|
 | 包里的版本 | 有哪些版本，导入后是哪一版。 |

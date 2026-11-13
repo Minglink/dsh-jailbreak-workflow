@@ -364,7 +364,8 @@ async function mtimeOf(path: string): Promise<number> {
  * 不在、读不了、是文件夹却要文件（或反过来）都回 `null`。只看一层，最多 {@link RUN_DIR_MAX} 项。
  *
  * 文件夹隔一会儿就被问一次：文件夹自己的时间没变时，只再看上回最近改过的 {@link DIR_HOT} 份，
- * 每 {@link DIR_RESCAN_MS} 整份重看一次，几千份的文件夹也不必每回逐份 stat。
+ * 每 {@link DIR_RESCAN_MS} 整份重看一次，几千份的文件夹也不必每回逐份 stat。文件夹自己的时间可能只精确到秒，
+ * 有些文件系统连删带加都不改它，所以快路上再数一遍这一层有几项（只列名字，不逐份 stat）；对不上就整份重看。
  */
 export async function statRunPath(
   full: string,
@@ -380,15 +381,24 @@ export async function statRunPath(
   if (!info.isDirectory()) return null
   const now = Date.now()
   const known = dirScans.get(full)
+  let names: string[] | undefined
   if (known !== undefined && known.dirMtime === info.mtimeMs && now - known.at < DIR_RESCAN_MS) {
-    const times = await Promise.all(known.hot.map((name) => mtimeOf(join(full, name))))
-    return { size: known.count, mtime: Math.max(info.mtimeMs, known.newest, ...times) }
+    try {
+      names = await readdir(full)
+    } catch {
+      return null
+    }
+    if (names.length === known.count) {
+      const times = await Promise.all(known.hot.map((name) => mtimeOf(join(full, name))))
+      return { size: known.count, mtime: Math.max(info.mtimeMs, known.newest, ...times) }
+    }
   }
-  let names: string[]
-  try {
-    names = await readdir(full)
-  } catch {
-    return null
+  if (names === undefined) {
+    try {
+      names = await readdir(full)
+    } catch {
+      return null
+    }
   }
   const shown = names.slice(0, RUN_DIR_MAX)
   const times = await Promise.all(shown.map((name) => mtimeOf(join(full, name))))
