@@ -8,7 +8,7 @@
 
 <div align="center">
 
-[简体中文](./README.md) | English · [Forum](https://openorigin.link/) (invite code `CESFAVBR`) · QQ Group `1135498706`
+[简体中文](./README.md) | English | [日本語](./README.ja.md) · [Forum](https://openorigin.link/) (invite code `CESFAVBR`) · QQ Group `1135498706`
 
 </div>
 
