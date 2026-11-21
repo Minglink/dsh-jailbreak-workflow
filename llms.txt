@@ -36,4 +36,4 @@
 - [README (English)](https://github.com/Minglink/dsh-jailbreak-workflow/blob/master/README.en.md)
 - [Changelog](https://github.com/Minglink/dsh-jailbreak-workflow/blob/master/CHANGELOG.md)
 - 破甲技术交流论坛: https://openorigin.link/
-- QQ 群: 1135498706
+- QQ 群: 1108766989
