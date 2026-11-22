@@ -57,9 +57,7 @@
 </table>
 
 
-### 4. 实证数据与架构演进仪表板（折线图 / 柱状图）
-
-![dsh-workflows 实证数据与架构演进仪表板：多阶段流水线演进、长会话 Safe Turn Depth 折线图、工作流拓扑演进规模与双裁判校准警示](./assets/metrics-dashboard.webp)
+### 4. 双仓闭环架构
 
 ```mermaid
 flowchart LR

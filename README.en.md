@@ -68,9 +68,7 @@ Ready-made `.wflite.zip` workflow bundles live in the companion repository [Ming
   </tr>
 </table>
 
-### 4. Empirical Benchmarks & Architecture Dashboard
-
-![Empirical Benchmarks & Architecture Dashboard: multi-stage pipeline progression, Safe Turn Depth retention line chart, workflow scale evolution, and judge calibration variance](./assets/metrics-dashboard.webp)
+### 4. Dual-Repo Closed-Loop Architecture
 
 ```mermaid
 flowchart LR
