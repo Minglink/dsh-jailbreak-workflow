@@ -57,6 +57,18 @@
 </table>
 
 
+### 4. 实证数据与架构演进仪表板（折线图 / 柱状图）
+
+![dsh-workflows 实证数据与架构演进仪表板：多阶段流水线演进、长会话 Safe Turn Depth 折线图、工作流拓扑演进规模与双裁判校准警示](./assets/metrics-dashboard.webp)
+
+```mermaid
+flowchart LR
+  A["dsh-jailbreak-workflow<br/>画布插件 (DSH 0.11.0)"] -- "导入 .wflite.zip" --> B["破甲制作 v3<br/>10 步 · 27 节点 · 69 边"]
+  B -- "transfer_back.md 战绩回灌" --> C["破甲炼化 v2<br/>8 步 · 22 节点 · 41 边"]
+  C -- "TRANSFER-NOTES.md 六类弹药" --> B
+  B -. "开源交流 · 论文复现" .-> D["O站 (openorigin.link)<br/>AI 技术开源分享论坛"]
+```
+
 ## 📦 安装
 
 适配 DeepSeek Harness 0.2.x 的正式版；0.2.0 与 0.2.1 连预览版（rc、beta）一起支持。

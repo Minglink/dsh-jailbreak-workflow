@@ -68,6 +68,18 @@ Ready-made `.wflite.zip` workflow bundles live in the companion repository [Ming
   </tr>
 </table>
 
+### 4. Empirical Benchmarks & Architecture Dashboard
+
+![Empirical Benchmarks & Architecture Dashboard: multi-stage pipeline progression, Safe Turn Depth retention line chart, workflow scale evolution, and judge calibration variance](./assets/metrics-dashboard.webp)
+
+```mermaid
+flowchart LR
+  A["dsh-jailbreak-workflow<br/>DSH 0.11.0 Plugin"] -- "Import .wflite.zip" --> B["破甲制作 v3<br/>10 stages · 27 nodes · 69 edges"]
+  B -- "transfer_back.md feedback" --> C["破甲炼化 v2<br/>8 stages · 22 nodes · 41 edges"]
+  C -- "TRANSFER-NOTES.md 6 ammo types" --> B
+  B -. "Open Research" .-> D["OpenOrigin (openorigin.link)<br/>AI Open-Source Forum"]
+```
+
 ## 📦 Install
 
 Works with DeepSeek Harness 0.2.x stable builds; 0.2.0 and 0.2.1 are supported including their preview builds (rc, beta).
