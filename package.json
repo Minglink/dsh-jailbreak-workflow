@@ -26,9 +26,16 @@
     "dsh",
     "dsh-plugin",
     "dsh-plugins",
+    "dsh-workflow-lite",
     "workflow",
     "react-flow",
-    "soft-orchestration"
+    "soft-orchestration",
+    "ai-safety",
+    "llm-security",
+    "red-teaming",
+    "arxiv-research",
+    "mcp-security",
+    "openorigin"
   ],
   "engines": {
     "node": ">=22",

@@ -132,6 +132,47 @@ export function HubSettings(props: {
             </button>
           </Row>
         </Group>
+
+        <Group title={t('cfg.groupCommunity')}>
+          <div className={cx(hub.item, css.item)}>
+            <span className={hub.itemIcon}>
+              <Icon name="globe" size={16} />
+            </span>
+            <div className={hub.itemText}>
+              <span className={hub.itemTitle}>{t('cfg.forumTitle')}</span>
+              <span className={hub.itemDesc}>{t('cfg.forumDesc')}</span>
+            </div>
+            <div className={hub.itemEnd}>
+              <a
+                className={cx(ui.btn, ui.small)}
+                href="https://openorigin.link/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('cfg.forumAction')}
+              </a>
+            </div>
+          </div>
+          <div className={cx(hub.item, css.item)}>
+            <span className={hub.itemIcon}>
+              <Icon name="library" size={16} />
+            </span>
+            <div className={hub.itemText}>
+              <span className={hub.itemTitle}>{t('cfg.packsTitle')}</span>
+              <span className={hub.itemDesc}>{t('cfg.packsDesc')}</span>
+            </div>
+            <div className={hub.itemEnd}>
+              <a
+                className={cx(ui.btn, ui.small)}
+                href="https://github.com/Minglink/dsh-workflows"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('cfg.packsAction')}
+              </a>
+            </div>
+          </div>
+        </Group>
       </div>
 
       {state.dirty.length > 0 && view.writable && (

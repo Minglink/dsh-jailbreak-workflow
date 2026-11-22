@@ -17,7 +17,11 @@
 [![npm](https://img.shields.io/npm/v/@minglink/dsh-jailbreak-workflow.svg)](https://www.npmjs.com/package/@minglink/dsh-jailbreak-workflow)
 [![node](https://img.shields.io/badge/node-22%2B-339933.svg)](https://nodejs.org)
 [![DeepSeek Harness 0.2.x](https://img.shields.io/badge/DeepSeek%20Harness-0.2.x-4d6bfe.svg)](https://github.com/deepseek-ai/deepseek-harness)
+[![dsh-workflow-lite 0.11.0](https://img.shields.io/badge/dsh--workflow--lite-0.11.0-0ea5e9.svg)](https://github.com/Minglink/dsh-jailbreak-workflow)
 [![workflow packs](https://img.shields.io/badge/workflow%20packs-dsh--workflows-3e7ce4.svg)](https://github.com/Minglink/dsh-workflows)
+[![arXiv](https://img.shields.io/badge/arXiv%20Papers-90%2B-b31b1b.svg)](https://github.com/Minglink/dsh-workflows/tree/master/docs/research)
+[![OpenOrigin Forum](https://img.shields.io/badge/OpenOrigin-AI%20Open--Source%20Forum-f59e0b.svg)](https://openorigin.link/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](./LICENSE)
 
 </div>
 
@@ -199,12 +203,20 @@ This repo is the plugin (canvas and compiler); [dsh-workflows](https://github.co
 
 The plugin ships no execution engine and needs no extra service; scheduling and judgement stay with the model in your current session.
 
+## 💬 Open-Source Community (OpenOrigin / O-Station)
+
+Join **[OpenOrigin (O-Station) · AI Tech Open-Source Forum](https://openorigin.link/)** to discuss LLM safety research, red-teaming methodologies, DeepSeek Harness plugins, and custom `.wflite.zip` workflows:
+
+- **Forum**: [https://openorigin.link/](https://openorigin.link/) (invite code: `CESFAVBR`)
+- **QQ Group**: `1108766989`
+- **Workflow Packs**: [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows)
+
 ---
 
 <div align="center">
 
 **dsh-jailbreak-workflow** · canvas → plan prompt → model execution
 
-[Workflow packs · dsh-workflows](https://github.com/Minglink/dsh-workflows) · maintained by [MingLin](https://github.com/Minglink)
+[OpenOrigin Forum](https://openorigin.link/) · [Workflow packs · dsh-workflows](https://github.com/Minglink/dsh-workflows) · maintained by [MingLin](https://github.com/Minglink)
 
 </div>
