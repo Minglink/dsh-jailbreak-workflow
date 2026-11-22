@@ -8,7 +8,7 @@
 
 <div align="center">
 
-简体中文 | [English](./README.en.md) · [破甲技术交流论坛](https://openorigin.link/)（邀请码 `CESFAVBR`）· QQ 群 `1108766989`
+简体中文 | [English](./README.en.md) | [AI 检索索引 (`llms.txt`)](./llms.txt) · [工作流合集 `dsh-workflows`](https://github.com/Minglink/dsh-workflows) · [破甲技术交流论坛](https://openorigin.link/)（邀请码 `CESFAVBR`）· QQ 群 `1108766989`
 
 [![npm](https://img.shields.io/npm/v/@minglink/dsh-jailbreak-workflow.svg)](https://www.npmjs.com/package/@minglink/dsh-jailbreak-workflow) [![node](https://img.shields.io/badge/node-22%2B-339933.svg)](https://nodejs.org) [![DeepSeek Harness 0.2.x](https://img.shields.io/badge/DeepSeek%20Harness-0.2.x-4d6bfe.svg)](https://github.com/deepseek-ai/deepseek-harness) [![workflow packs](https://img.shields.io/badge/workflow%20packs-dsh--workflows-3e7ce4.svg)](https://github.com/Minglink/dsh-workflows)
 
@@ -19,7 +19,7 @@
 连线可以带**任意条件**，顺序、并行、汇合、分支、循环、回退全都支持——插件里没有执行引擎，一切由当前会话中的模型完成。适合把能画成步骤图的活都交给它跑：多步编码任务、研究流水线、内容生产流水线；几百步的大图拖拽、平移照样满帧。
 
 > [!TIP]
-> **工作流合集**：[Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows)——现成的 `.wflite.zip` 工作流包，下载导入即用，已上架「破甲制作」研究流水线（见下文 [📋 支持的工作流](#-支持的工作流)）。
+> **官方配套工作流合集**：[Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) —— 现成的 `.wflite.zip` 工作流包，下载导入即用，已上架「**破甲制作 v3**」「**破甲炼化 v2**」「**pojia-fullflow v1**」三大工作流（见下文 [📋 支持的工作流](#-支持的工作流)）。
 
 > [!NOTE]
 > **实验阶段**：功能和数据格式仍在调整，后续任何版本都可能包含不兼容的改动。
@@ -27,21 +27,31 @@
 
 ## 📋 支持的工作流
 
-现成的工作流放在工作流合集 [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) 里，下载 `.wflite.zip` 后在「**工作流中心**」导入即可运行。
+现成的工作流包托管在配套仓库 [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows)，均已通过 `dsh-workflow-lite 0.11.0` 结构校验与 SHA-256 哈希核对。下载 `.wflite.zip` 后在「**工作流中心**」一键导入即可运行：
 
-| 工作流 | 说明 | 下载 |
-|---|---|---|
-| **破甲制作** | LLM 破甲研究自动化流水线，15 步：**探针测试**（200+ 探针，覆盖身份系统 / 混合帧 / 轻量三种架构）→ **拒绝模式分析** → **定制破甲词生成** → **API 验证** → **三件套输出**（破甲词文件 + 使用手册（帧矩阵 + 推回词库）+ 研究报告）。内置 `jailbreak-research` Skill：10 个测试脚本 + 4 套提示词模板 | [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) |
+| 工作流 | 定位与能力 | 规模 | 内置 Skill | 下载 |
+|---|---|---|---|---|
+| **破甲制作 v3** | 依据 90+ 篇 arXiv 2024–2026 论文构建的十步多回路 LLM 漏洞与边界研究流水线（护栏/拓扑侦察 → 孪生锐度基线 → 多臂自适应回调 → 推理/CoT/层级测绘 → 三维概念锥建模 → 五套架构合成 → BoN/多轮压测 → 双裁判 CJE 校准与消融 → 报告 → 军械库回灌），含 `pass / fail_prompt / fail_surface` 三路自愈路由 | 10 步 · 27 节点 / 69 边 | `jailbreak-research`（10 脚本 + 6 模板） | [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) |
+| **破甲炼化 v2** | 公开破甲词 & 实战回灌 → WildTeaming `Mine→Compose` 机制交叉复合配方 → 连续评分尺抽锋验证 → 铸成 `ARSENAL.md` 军械库与对接「破甲制作 v3」五架构的 `TRANSFER-NOTES.md` 六类弹药表 | 8 步 · 22 节点 / 41 边 | `jb-distillery`（五卷底册 + 词条卡） | [破甲炼化.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲炼化.wflite.zip) |
+| **pojia-fullflow v1** | 二进制 / 移动端 / 协议 / 加密逆向全流程（需求入口 → 宿主装配 → 判断取线 → 五角色干活 → 回流自评 → 交付落库；依赖本地 `dsh-pojia-toolkit` 的 `pj_*` 工具） | 10 步 · 20 节点 / 32 边 | 10 步自足任务正文 | [pojia-fullflow.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/pojia-fullflow.wflite.zip) |
 
-## 🖼️ 工作流示例
+## 🖼️ 工作流画布预览
 
-「破甲制作」研究流水线在画布上的样子——15 个步骤串成一条流水线，分支、循环和产出文件都直接画在图上。
+### 1. 破甲制作 v3（10 步多回路 · 双自愈回边）
 
-![破甲制作工作流的完整画布：探针测试、拒绝模式分析、定制破甲词生成、API 验证、三件套输出依次相连，每次跑完把结果写回 probes.md、analysis.md、words.md、verify.md、report.md、manual.md](./assets/poyazhi-canvas.webp)
+![破甲制作 v3 完整画布：护栏与拓扑侦察、孪生锐度基线、多臂自适应回调、推理与CoT面测绘、三维概念锥建模、五架构合成、BoN与多轮压测、双裁判CJE校准与消融、报告与军械库回灌](./assets/canvas-v3.webp)
+
+### 2. 破甲炼化 v2（8 步 · WildTeaming Mine→Compose 炼化厂）
+
+![破甲炼化 v2 完整画布：采撷入窖（含实战回灌）、通读贴标、家族聚类与行为图谱、网海对阵、炼药成丹、机制交叉组合、连续评分尺抽锋试刃、铸库收卷](./assets/canvas-distillery-v2.webp)
+
+### 3. pojia-fullflow v1（10 步逆向全流程）与插件侧边栏
+
+![pojia-fullflow 完整画布](./assets/canvas-pojia.webp)
 
 <table>
   <tr>
-    <td><img src="./assets/poyazhi-flow.webp" width="620" alt="流程细节：拒绝模式分析到三件套输出，带「通过 / 未通过」循环分支"></td>
+    <td><img src="./assets/poyazhi-flow.webp" width="620" alt="插件实机画布细节：节点连接、条件分支与循环回边"></td>
     <td><img src="./assets/poyazhi-sidebar.webp" width="260" alt="左侧步骤库：基础、常用步骤、我的步骤三组，拖到画布上使用"></td>
   </tr>
 </table>
@@ -78,9 +88,27 @@ dsh web
 
 安装完成后，会话页顶部会出现「**工作流**」标签页。
 
-## 🚀 使用
+## 🚀 详细使用教程
 
-### 让模型创建
+### 一、从零跑通「破甲制作 v3」完整教程（5 步上手）
+
+1. **安装并启用插件**：按上方 [📦 安装](#-安装) 步骤装好 `@minglink/dsh-jailbreak-workflow` 并重启 DeepSeek Harness，确认会话页顶部出现「**工作流**」标签页。
+2. **下载并导入 `.wflite.zip`**：
+   - 从 [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) 下载 [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip)（默认内置 `v3`，同时保留 `v1`/`v2` 历史版本）。
+   - 打开画布左上角的「**工作流中心**」→ 点击「**导入**」→ 选中下载的 zip 包。
+   - 在导入确认框中核对内置 Skill（`jailbreak-research`）的放置位置（默认安装到用户 Skill 目录），点击确认。
+3. **开启运行状态记录（推荐）**：进入「工作流设置」，开启「**记录运行状态**」，执行时每一步的状态、摘要与产出文件都会实时回显在画布上。
+4. **填写执行前提问并启动**：点击右上角「**执行**」，按提示填写 5 项参数：
+   - **目标模型 ID**（必填）：如 `deepseek-chat`、`claude-sonnet-4-5`、`gemini-2.5-pro`
+   - **API Key**（必填）：仅在本地脚本调用目标接口，不上传任何第三方
+   - **API 类型与自定义 Base URL**（可选）：留空默认 OpenAI 官方兼容接口；中转站/本地服务可填 `openai,https://your-gateway/v1` 或 `anthropic` / `google`
+   - **目标研究架构**（五选一）：`混合帧架构`（默认）/ `身份系统架构` / `轻量架构` / `身份主权型（第四架构）` / `Codex 精神型（第五架构·工作台叠装）`
+   - **研究攻击面聚焦**（五选一）：`全栈综合` / `基础对话边界` / `推理链 LRM / CoT` / `Agent 工作台与 MCP 工具面` / `采样与解码配置面`
+5. **查看产物与双工作流闭环**：
+   - 执行完毕后，在实例目录（默认 `.workflow-lite/runs/<实例>/out`）可直接预览 `recon_profile.md`、`probes.md`、`callback_bounds.md`、`inference_surface.md`、`analysis.md`、`words.md`、`stress_results.md`、`verify.md`、`report.md`、`manual.md` 与 `transfer_back.md`。
+   - **进阶闭环**：把本轮产出的 `transfer_back.md` 路径填入「**破甲炼化 v2**」的可选输入 `input-feedback`，即可将现役实测战绩入库并合成新的 `TRANSFER-NOTES.md` 弹药表，反哺下一轮研究。
+
+### 二、让模型创建自定义工作流
 
 在对话中用一句话描述流程，例如：
 
@@ -88,15 +116,10 @@ dsh web
 
 模型会创建工作流，画布上会同步显示。检查无误后，点击右上角「**执行**」，或让模型直接执行。
 
-### 手动编辑
+### 三、手动编辑与跟踪进度
 
-1. 打开「工作流」标签页，新建一个工作流。
-2. 从左侧步骤库将步骤拖到画布上，填写提示词并连线。
-3. 点击右上角「**执行**」，或在对话中请模型执行该工作流。
-
-### 跟踪进度
-
-在「工作流设置」中开启「**记录运行状态**」，此后每次执行都会生成一条记录，画布随进度更新。执行记录、工作流与版本统一在画布左上角的「**工作流中心**」中管理。
+1. 打开「工作流」标签页，新建一个工作流，从左侧步骤库拖拽步骤、填写提示词并连线。
+2. 在「工作流设置」中开启「**记录运行状态**」，执行记录、工作流与版本统一在「**工作流中心**」中管理。
 
 ## 🧩 功能
 

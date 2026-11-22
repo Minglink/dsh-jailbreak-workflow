@@ -8,7 +8,7 @@
 
 <div align="center">
 
-[简体中文](./README.md) | English · [Forum](https://openorigin.link/) (invite code `CESFAVBR`) · QQ Group `1108766989`
+[简体中文](./README.md) | **English** | [AI Index (`llms.txt`)](./llms.txt) · [Workflow Packs `dsh-workflows`](https://github.com/Minglink/dsh-workflows) · [Forum](https://openorigin.link/) (invite code `CESFAVBR`) · QQ Group `1108766989`
 
 </div>
 
@@ -26,7 +26,7 @@ A soft-workflow plugin for [DeepSeek Harness](https://github.com/deepseek-ai/dee
 Edges can carry **any condition**, and flows can be sequential, parallel, joined, conditionally branched, looped or rolled back — the plugin ships no execution engine; everything is done by the model in your current session. Hand it any work you can draw as a step graph: multi-step coding jobs, research pipelines, content pipelines. Canvases with hundreds of steps still drag and pan at full frame rate.
 
 > [!TIP]
-> **Workflow packs**: [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) — ready-to-import `.wflite.zip` workflow packs; the "破甲制作" research pipeline is already up (see [📋 Available workflows](#-available-workflows) below).
+> **Official Workflow Packs**: [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) — ready-to-import `.wflite.zip` packages for **破甲制作 v3**, **破甲炼化 v2**, and **pojia-fullflow v1** (see [📋 Available workflows](#-available-workflows) below).
 
 > [!NOTE]
 > **Experimental**: features and data formats are still changing, and any release may include breaking changes.
@@ -35,22 +35,32 @@ Edges can carry **any condition**, and flows can be sequential, parallel, joined
 
 ## 📋 Available workflows
 
-Ready-made workflows live in the [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) collection. Download a `.wflite.zip` and import it from the **Workflow hub**.
+Ready-made `.wflite.zip` workflow bundles live in the companion repository [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) (validated for `dsh-workflow-lite 0.11.0` with SHA-256 skill checksums). Download any bundle and import it from the **Workflow hub**:
 
-| Workflow | What it does | Download |
-|---|---|---|
-| **破甲制作** | Automated LLM jailbreak-research pipeline, 15 steps: **probe testing** (200+ probes across identity-system / hybrid-frame / lightweight architectures) → **refusal-pattern analysis** → **tailored jailbreak-prompt generation** → **API verification** → **three deliverables** (jailbreak prompts + usage manual with frame matrix and push-back prompt library + research report). Ships with the `jailbreak-research` Skill: 10 test scripts + 4 prompt templates | [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) |
+| Workflow | Scope & Research Capabilities | Scale | Bundled Skill | Download |
+|---|---|---|---|---|
+| **破甲制作 v3** | 10-stage multi-loop LLM safety & vulnerability evaluation pipeline grounded in 90+ arXiv 2024–2026 papers (guardrail/topology recon → Benign-Twin baseline → Red-Bandit/MAP-Elites callback probing → decoding/CoT/hierarchy profiling → 3D concept-cone modeling → 5-architecture synthesis → BoN/multi-turn stress testing → dual-judge CJE calibration & ablations → report → armory feedback), with `pass / fail_prompt / fail_surface` self-healing routing | 10 stages · 27 nodes / 69 edges | `jailbreak-research` (10 scripts + 6 templates) | [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) |
+| **破甲炼化 v2** | Structured red-teaming armory & WildTeaming `Mine→Compose` refinery: ingests public prompt corpora and live `transfer_back.md` feedback, synthesizes cross-family recipes, runs continuous-score validation with soft-refusal penalties, and exports `ARSENAL.md` + 5-architecture `TRANSFER-NOTES.md` | 8 stages · 22 nodes / 41 edges | `jb-distillery` (5-volume library + entry card) | [破甲炼化.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲炼化.wflite.zip) |
+| **pojia-fullflow v1** | End-to-end binary / mobile / protocol / crypto reverse-engineering workflow (requires local `dsh-pojia-toolkit` `pj_*` tools) | 10 stages · 20 nodes / 32 edges | 10 self-contained step prompts | [pojia-fullflow.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/pojia-fullflow.wflite.zip) |
 
-## 🖼️ Example workflow
+## 🖼️ Workflow canvas previews
 
-The "破甲制作" research pipeline on the canvas — 15 steps chained into one flow, with branches, loops and output files drawn right on the graph.
+### 1. 破甲制作 v3 (10-stage multi-loop pipeline with dual self-healing feedback edges)
 
-![Full canvas of the 破甲制作 workflow: probe testing, refusal-pattern analysis, tailored jailbreak-prompt generation, API verification and the three-deliverable output linked in sequence; each round writes back to probes.md, analysis.md, words.md, verify.md, report.md and manual.md](./assets/poyazhi-canvas.webp)
+![破甲制作 v3 canvas topology: 10 stages, 27 nodes, 69 edges, dual-judge CJE verification with pass / fail_prompt / fail_surface routing](./assets/canvas-v3.webp)
+
+### 2. 破甲炼化 v2 (8-stage WildTeaming Mine→Compose prompt refinery)
+
+![破甲炼化 v2 canvas topology: 8 stages, 22 nodes, 41 edges, Mine-to-Compose crossover and continuous-score validation](./assets/canvas-distillery-v2.webp)
+
+### 3. pojia-fullflow v1 & plugin UI
+
+![pojia-fullflow v1 canvas topology](./assets/canvas-pojia.webp)
 
 <table>
   <tr>
-    <td><img src="./assets/poyazhi-flow.webp" width="620" alt="Flow detail: from refusal-pattern analysis to the three-deliverable output, with the pass/fail loop branch"></td>
-    <td><img src="./assets/poyazhi-sidebar.webp" width="260" alt="Step library on the left: Basics, Common steps and My steps, dragged onto the canvas"></td>
+    <td><img src="./assets/poyazhi-flow.webp" width="620" alt="Live canvas detail: nodes, conditional branches, and loop edges"></td>
+    <td><img src="./assets/poyazhi-sidebar.webp" width="260" alt="Step library on the left: Basics, Common steps and My steps"></td>
   </tr>
 </table>
 
@@ -85,25 +95,38 @@ dsh web
 
 Once installed, a **Workflow** tab appears at the top of the session page.
 
-## 🚀 Usage
+## 🚀 Step-by-step usage guide
 
-### Ask the model
+### 1. Running 破甲制作 v3 end-to-end (5 steps)
+
+1. **Install & enable the plugin**: Follow [📦 Install](#-install) above to install `@minglink/dsh-jailbreak-workflow`, restart DeepSeek Harness, and confirm the **Workflow** tab appears at the top of the session view.
+2. **Download & import `.wflite.zip`**:
+   - Download [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) from [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) (defaults to `v3`, with `v1` and `v2` preserved in version history).
+   - Open the **Workflow hub** (top-left of the canvas) → click **Import** → select the `.wflite.zip` archive.
+   - Review where the bundled `jailbreak-research` Skill and files will be installed, then confirm.
+3. **Enable live progress tracking (recommended)**: Open **Workflow settings** and turn on **Record run state** so every stage's progress, summary, and generated files update live on the canvas.
+4. **Answer pre-run questions & click Run**:
+   - **Target model ID** (required): e.g., `deepseek-chat`, `claude-sonnet-4-5`, `gemini-2.5-pro`
+   - **API Key** (required): used locally by the evaluation scripts; never uploaded externally
+   - **API type & custom Base URL** (optional): leave blank for default OpenAI-compatible API, or enter `openai,https://your-gateway/v1`, `anthropic`, or `google`
+   - **Target architecture** (5 choices): Hybrid Frame (default), Identity System, Lightweight, Identity Sovereign (4th), or Codex Spirit workspace overlay (5th)
+   - **Attack surface focus** (5 choices): Full-stack, Dialogue Boundary, Reasoning LRM / CoT, Agent Workspace & MCP Tools, or Decoding & Sampling Config
+5. **Inspect outputs & close the dual-workflow loop**:
+   - Preview all stage outputs (`recon_profile.md` → `probes.md` → `callback_bounds.md` → `inference_surface.md` → `analysis.md` → `words.md` → `stress_results.md` → `verify.md` → `report.md` / `manual.md` → `transfer_back.md`) directly inside the run directory (default `.workflow-lite/runs/<instance>/out`).
+   - **Closed loop**: Pass `transfer_back.md` into **破甲炼化 v2** (`input-feedback`) to archive verified findings and synthesize updated `TRANSFER-NOTES.md` recipes for the next research cycle.
+
+### 2. Ask the model to build a custom workflow
 
 Describe the flow in one sentence in the conversation, for example:
 
 > Create a workflow: write the code, then review it; if the review fails, go back and fix it, at most three rounds.
 
-The model creates the workflow and the canvas shows it as it is built. When it looks right, click **Run** in the top-right corner, or ask the model to run it.
+The model creates the workflow and the canvas shows it as it is built. Click **Run** in the top-right corner, or ask the model to run it.
 
-### Edit by hand
+### 3. Edit by hand & track progress
 
-1. Open the **Workflow** tab and create a workflow.
-2. Drag steps from the library on the left onto the canvas, fill in their prompts, and connect them.
-3. Click **Run** in the top-right corner, or ask the model in the conversation to run the workflow.
-
-### Follow progress
-
-Turn on **Record run state** in **Workflow settings**. Every run then leaves a record and the canvas updates as the model works. Run records, workflows and versions are managed in the **Workflow hub**, opened from the top-left corner of the canvas.
+1. Open the **Workflow** tab, create a workflow, drag steps from the left library, fill in prompts, and connect edges.
+2. Turn on **Record run state** in **Workflow settings**; all runs, workflows, and versions are managed centrally in the **Workflow hub**.
 
 ## 🧩 Features
 

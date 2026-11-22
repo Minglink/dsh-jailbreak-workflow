@@ -1,39 +1,25 @@
-# dsh-jailbreak-workflow (@minglink/dsh-jailbreak-workflow)
+# dsh-jailbreak-workflow
 
-> Canvas → plan prompt → model execution. A soft-workflow plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness): design a flow on a visual canvas, compile it into one plan prompt, and let the model in the current session carry it out. No execution engine, no extra service — scheduling and judgement stay with the model. Ships with the ready-made「破甲制作」jailbreak-research pipeline (15 steps, 200+ probes, three deliverables) via the companion workflow pack collection.
+> Visual soft-workflow plugin (`@minglink/dsh-jailbreak-workflow`) for DeepSeek Harness (`0.2.x`): design step graphs on a canvas, compile them into a single plan prompt, and let the session model execute branches, loops, and bundled Skills.
 
-- Repository: https://github.com/Minglink/dsh-jailbreak-workflow
-- npm: https://www.npmjs.com/package/@minglink/dsh-jailbreak-workflow
-- Workflow packs (ready to import): https://github.com/Minglink/dsh-workflows
-- Issues: https://github.com/Minglink/dsh-jailbreak-workflow/issues
-- Maintainer: Minglink (MingLin)
-- License: MIT for this repo's own code; bundled third-party code is itemized in THIRD_PARTY_NOTICES.md
+## Documentation
+- [README.md](./README.md): Primary Chinese documentation with installation, step-by-step usage tutorial, canvas previews, features, and FAQ.
+- [README.en.md](./README.en.md): Complete English documentation.
 
-## Compatibility
+## Installation
+- Web (Node.js 22+): `dsh plugin --profile web add @minglink/dsh-jailbreak-workflow && dsh web`
+- Desktop: Plugins → Add plugin → Install a third-party plugin → `@minglink/dsh-jailbreak-workflow` → restart DeepSeek Harness.
 
-- DeepSeek Harness 0.2.x stable builds are supported; 0.2.0 and 0.2.1 including their preview builds (rc, beta).
-- Node.js >= 22. Install (web profile): `dsh plugin --profile web add @minglink/dsh-jailbreak-workflow`, then `dsh web`. Desktop: Plugins → Add plugin → install third-party plugin `@minglink/dsh-jailbreak-workflow`, restart DSH.
-- If the Workflow tab never appears, the host silently skipped the plugin on a version mismatch — check the DSH version first.
+## Companion Workflow Repository (`Minglink/dsh-workflows`)
+- Repository: https://github.com/Minglink/dsh-workflows
+- `破甲制作 v3` (`workflows/破甲制作.wflite.zip`): 10-stage, 27-node, 69-edge multi-loop LLM safety & vulnerability evaluation pipeline grounded in 90+ arXiv 2024–2026 papers, with `pass / fail_prompt / fail_surface` self-healing routing and `jailbreak-research` skill.
+- `破甲炼化 v2` (`workflows/破甲炼化.wflite.zip`): 8-stage, 22-node, 41-edge prompt refinery implementing WildTeaming `Mine→Compose` crossover, continuous-score verification, and closed-loop `transfer_back.md` ingestion with `jb-distillery` skill.
+- `pojia-fullflow v1` (`workflows/pojia-fullflow.wflite.zip`): 10-stage, 20-node, 32-edge reverse-engineering workflow for `dsh-pojia-toolkit`.
 
-## Key facts
+## Key Concepts
+- Soft workflow: canvas graph compiles into a structured plan prompt executed by the current DeepSeek Harness session model (no external execution engine required).
+- `.wflite.zip`: portable package bundling `manifest.json`, versioned canvas documents (`versions/*.json`), and optional `skills/`.
+- Path variables: `{workflow}` resolves to `~/.dsh/workflow-lite/assets/<workflow-name>/`; `{instance}` resolves to `.workflow-lite/runs/<instance>/out`.
 
-- One workflow = one JSON file (React Flow native graph); each step's prompt is inline in `node.data.prompt`.
-- Edges carry conditions (pass/fail verdicts or free-form); sequence, parallel, join, branch, loop, and rollback are all expressed in the graph.
-- The plugin compiles the graph into a single dispatch plan stating execution order, loop conditions, and per-step inputs/outputs; the model then executes (directly, via subagents, or as a team) and reports progress back to the canvas.
-- Handles hundreds of steps smoothly; canvas interaction stays at full frame rate on large graphs.
-- Data layout: files traveling with a workflow default to `~/.dsh/workflow-lite/assets/<workflow name>/`; per-run outputs go to the configured output root (`.workflow-lite/runs/{instance}/out` by default); `{workflow}` and `{instance}` path variables are supported.
-- Exports: a workflow version can be packed as `.wflite.zip` (with files and Skills), or compiled into a plain Agent Skill that works without the plugin.
-- Optional run-state tracking records each step's status/summary so runs survive interruption and are visible on the canvas.
-- UI ships in 简体中文 and English with four light + four dark themes.
-
-## Workflow packs
-
-- [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) — automated LLM jailbreak-prompt research pipeline: probe testing (200+ probes across identity-system / hybrid-frame / lightweight architectures) → refusal-pattern analysis → tailored jailbreak-prompt generation → API verification → three deliverables (jailbreak prompt file, usage manual with frame matrix + push-back prompt library, research report). Includes the `jailbreak-research` skill: 10 test scripts + 4 prompt templates.
-
-## Optional
-
-- [README (简体中文)](https://github.com/Minglink/dsh-jailbreak-workflow#readme)
-- [README (English)](https://github.com/Minglink/dsh-jailbreak-workflow/blob/master/README.en.md)
-- [Changelog](https://github.com/Minglink/dsh-jailbreak-workflow/blob/master/CHANGELOG.md)
-- 破甲技术交流论坛: https://openorigin.link/
-- QQ 群: 1108766989
+## Keywords
+DeepSeek Harness, dsh-workflow-lite, dsh-jailbreak-workflow, visual workflow plugin, LLM red teaming, AI safety evaluation, soft workflow, React Flow canvas, arXiv research workflows, MCP security.
