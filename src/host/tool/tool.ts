@@ -31,7 +31,7 @@ import { checkName } from '../../shared/naming.ts'
 import { DEFAULT_OUTPUT_ROOT, WORKSPACE_ROOT } from '../../shared/outputPaths.ts'
 import { INSTANCE_VAR } from '../../shared/pathVars.ts'
 import { memoryOf, stepMemories, suggestMemoryId } from '../../shared/presets.ts'
-import { outputsOf, resourceGraph, stepResources } from '../../shared/resources.ts'
+import { nodeIndex, outputsOf, resourceGraph, stepResources } from '../../shared/resources.ts'
 import { NODE_STATUSES, RUN_STATUSES } from '../../shared/runState.ts'
 import type {
   ChangedEntry,
@@ -177,11 +177,15 @@ function sessionOf(exec: ToolExecView | undefined): SessionRef {
 }
 
 /** 步骤的索引条目（不含正文）：前置步骤，以及它读、写的资源。 */
-function indexEntry(document: WorkflowDocument, node: StepNode): NodeIndexEntry {
-  const analysis = analyzeGraph(document)
+function indexEntry(
+  document: WorkflowDocument,
+  node: StepNode,
+  analysis = analyzeGraph(document),
+  nodes = nodeIndex(document),
+): NodeIndexEntry {
   const predecessors = (analysis.predecessors.get(node.id) ?? []).slice().sort(compareByCodepoint)
-  const linked = stepResources(document, node.id)
-  const inputs = stepInputs(document, node.id)
+  const linked = stepResources(document, node.id, nodes)
+  const inputs = stepInputs(document, node.id, nodes)
   return {
     id: node.id,
     ...(node.data.label === undefined ? {} : { label: node.data.label }),
@@ -201,7 +205,7 @@ function indexEntry(document: WorkflowDocument, node: StepNode): NodeIndexEntry 
 }
 
 /** 输入节点的索引条目：问题、题型、选项、默认值、交给谁（占位与说明是给填写的人看的，不给）。 */
-function inputEntries(document: WorkflowDocument): InputIndexEntry[] {
+function inputEntries(document: WorkflowDocument, nodes = nodeIndex(document)): InputIndexEntry[] {
   return orderedInputs(document).map(({ id, data }) => ({
     id,
     question: data.question,
@@ -210,7 +214,7 @@ function inputEntries(document: WorkflowDocument): InputIndexEntry[] {
     ...(data.default === undefined ? {} : { default: data.default }),
     ...(data.required === true ? { required: true as const } : {}),
     ...(data.other === true ? { other: true as const } : {}),
-    readers: inputReaders(document, id),
+    readers: inputReaders(document, id, nodes),
   }))
 }
 
@@ -872,22 +876,20 @@ export function createWorkflowLiteHandler(
         const { warnings, compile } = splitProblems(load.problems)
         const nodeId = args.node
         if (nodeId === undefined || nodeId === '') {
+          const doc = load.document
+          const analysis = analyzeGraph(doc)
+          const nodes = nodeIndex(doc)
           const result: ReadIndexResult = {
             workflow: name,
-            viewport: load.document.viewport,
-            ...(load.document.settings === undefined ? {} : { settings: load.document.settings }),
-            nodes: sortedNodes(load.document).map((node) =>
-              indexEntry(load.document ?? document0(), node),
-            ),
-            ...(load.document.nodes.some(isResource)
+            viewport: doc.viewport,
+            ...(doc.settings === undefined ? {} : { settings: doc.settings }),
+            nodes: sortedNodes(doc).map((node) => indexEntry(doc, node, analysis, nodes)),
+            ...(doc.nodes.some(isResource)
               ? {
-                  resources: resourceEntries(
-                    load.document,
-                    await missingMemories(deps.dataDir(), load.document),
-                  ),
+                  resources: resourceEntries(doc, await missingMemories(deps.dataDir(), doc)),
                 }
               : {}),
-            ...(load.document.nodes.some(isInput) ? { inputs: inputEntries(load.document) } : {}),
+            ...(doc.nodes.some(isInput) ? { inputs: inputEntries(doc, nodes) } : {}),
             // 索引就是自检的入口：阻塞编译的问题也在这里给，不必为了看问题去编译（编译会建实例）。
             ...(compile.length === 0 ? {} : { problems: compile }),
             warnings,
@@ -1576,10 +1578,6 @@ export function registerWorkflowLiteTool(ctx: Context, deps: ToolDeps): () => vo
       execute: createWorkflowLiteHandler(deps),
     }),
   )
-}
-
-function document0(): WorkflowDocument {
-  return { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } }
 }
 
 function noRuns(): JsonValue {

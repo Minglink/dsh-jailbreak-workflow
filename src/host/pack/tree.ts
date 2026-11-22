@@ -18,6 +18,7 @@ export interface TreeFile {
   rel: string
   full: string
   bytes: number
+  mtimeMs?: number
 }
 
 export interface Tree {
@@ -54,7 +55,7 @@ export async function walkTree(root: string, limits: TreeLimits = {}): Promise<T
     const over = info.size > maxBytes
     return {
       dir: false,
-      files: [{ rel: basename(root), full: root, bytes: info.size }],
+      files: [{ rel: basename(root), full: root, bytes: info.size, mtimeMs: info.mtimeMs }],
       bytes: info.size,
       skipped: 0,
       over,
@@ -87,14 +88,15 @@ export async function walkTree(root: string, limits: TreeLimits = {}): Promise<T
         tree.skipped += 1
         continue
       }
-      let size: number
+      let fileInfo: Awaited<ReturnType<typeof lstat>>
       try {
-        size = (await lstat(full)).size
+        fileInfo = await lstat(full)
       } catch {
         tree.skipped += 1
         continue
       }
-      tree.files.push({ rel, full, bytes: size })
+      const size = fileInfo.size
+      tree.files.push({ rel, full, bytes: size, mtimeMs: fileInfo.mtimeMs })
       tree.bytes += size
       if (tree.files.length > maxFiles || tree.bytes > maxBytes) tree.over = true
     }

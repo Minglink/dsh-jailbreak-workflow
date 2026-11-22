@@ -879,11 +879,12 @@ class FileRepository implements Repository {
   async list(): Promise<ListResult> {
     const warnings: ToolWarning[] = []
 
-    const [scan, templateNodes, legacy] = await Promise.all([
+    const [scan, templateNodes, nodesKind] = await Promise.all([
       scanWorkflowDir(this.dataDir),
       scanTemplateDir(this.dataDir),
-      this.detectLegacy(),
+      pathKind(join(this.dataDir, 'nodes')),
     ])
+    const legacy = scan.directories.length > 0 || nodesKind === 'dir'
 
     if (legacy) {
       warnings.push({
@@ -895,17 +896,23 @@ class FileRepository implements Repository {
     this.reportIgnored(scan, 'workflows/', warnings)
     this.reportIgnored(templateNodes, 'templates/nodes/', warnings)
 
-    const workflows: WorkflowEntry[] = []
-    for (const name of scan.names) {
-      const entry = await this.describeWorkflow(name, scan)
-      const versions = await countVersions(this.dataDir, name)
-      workflows.push(versions > 0 ? { ...entry, versions } : entry)
-    }
+    const [workflows, nodes] = await Promise.all([
+      Promise.all(
+        scan.names.map(async (name) => {
+          const [entry, versions] = await Promise.all([
+            this.describeWorkflow(name, scan),
+            countVersions(this.dataDir, name),
+          ])
+          return versions > 0 ? { ...entry, versions } : entry
+        }),
+      ),
+      this.describeTemplates(templateNodes.names, warnings),
+    ])
 
     return {
       workflows,
       templates: {
-        nodes: await this.describeTemplates(templateNodes.names, warnings),
+        nodes,
       },
       warnings,
     }
@@ -2271,12 +2278,6 @@ class FileRepository implements Repository {
     return ok(candidate)
   }
 
-  private async detectLegacy(): Promise<boolean> {
-    const scan = await scanWorkflowDir(this.dataDir)
-    if (scan.directories.length > 0) return true
-    return (await pathKind(join(this.dataDir, 'nodes'))) === 'dir'
-  }
-
   private reportIgnored(scan: DirScan, label: string, warnings: ToolWarning[]): void {
     for (const name of scan.ignored) {
       warnings.push({
@@ -2362,40 +2363,61 @@ class FileRepository implements Repository {
     return { ...entry }
   }
 
+  private readonly templateCache = new Map<
+    string,
+    { text: string; entry: TemplateEntry; warnings: ToolWarning[] }
+  >()
+
   private async describeTemplates(
     names: readonly string[],
     warnings: ToolWarning[],
   ): Promise<TemplateEntry[]> {
-    const entries: TemplateEntry[] = []
-    for (const name of names) {
-      const text = await readFileText(templateFile(this.dataDir, name))
-      if (text === null) {
-        entries.push({ name, invalid: true, reason: '文件在扫描后消失' })
-        continue
-      }
-      // 解析一次，判定与展示都用它：从前这里和 `templateProblems` 各 parse 一遍。
-      const parsed = parseNodeData(text)
-      const errors = parsed.problems.filter(
-        (problem) => problem.level === 'save' || problem.level === 'compile',
-      )
-      // 形状能读、但值得说一声的（比如把整个节点存成了模板）走警告通道，不挡步骤库显示。
-      warnings.push(...problemsToWarnings(parsed.problems))
-      // 顺带给出它的描述：步骤库的条目上要显示"这一步做什么"。
-      const data = parsed.data
-      const description = data.description
-      const described = {
-        ...(description === undefined || description === '' ? {} : { description }),
-        // 我的步骤自己选的图标与颜色：步骤库的条目照着画。
-        ...(data.icon === undefined ? {} : { icon: data.icon }),
-        ...(data.color === undefined ? {} : { color: data.color }),
-      }
-      if (errors.length > 0) {
-        entries.push({ name, invalid: true, reason: describeProblems(errors), ...described })
-      } else {
-        entries.push({ name, ...described })
-      }
-    }
-    return entries
+    const loaded = await Promise.all(
+      names.map(async (name) => {
+        const file = templateFile(this.dataDir, name)
+        const text = await readFileText(file)
+        if (text === null) {
+          this.templateCache.delete(file)
+          return {
+            entry: { name, invalid: true as const, reason: '文件在扫描后消失' },
+            warnings: [] as ToolWarning[],
+          }
+        }
+        const cached = this.templateCache.get(file)
+        if (cached !== undefined && cached.text === text && cached.entry.name === name) {
+          return { entry: { ...cached.entry }, warnings: cached.warnings }
+        }
+        // 解析一次，判定与展示都用它：从前这里和 `templateProblems` 各 parse 一遍。
+        const parsed = parseNodeData(text)
+        const errors = parsed.problems.filter(
+          (problem) => problem.level === 'save' || problem.level === 'compile',
+        )
+        const tplWarnings = problemsToWarnings(parsed.problems)
+        // 顺带给出它的描述：步骤库的条目上要显示"这一步做什么"。
+        const data = parsed.data
+        const description = data.description
+        const described = {
+          ...(description === undefined || description === '' ? {} : { description }),
+          // 我的步骤自己选的图标与颜色：步骤库的条目照着画。
+          ...(data.icon === undefined ? {} : { icon: data.icon }),
+          ...(data.color === undefined ? {} : { color: data.color }),
+        }
+        const entry: TemplateEntry =
+          errors.length > 0
+            ? { name, invalid: true, reason: describeProblems(errors), ...described }
+            : { name, ...described }
+        this.templateCache.delete(file)
+        this.templateCache.set(file, { text, entry, warnings: tplWarnings })
+        while (this.templateCache.size > MAX_LIST_CACHE) {
+          const oldest = this.templateCache.keys().next()
+          if (oldest.done) break
+          this.templateCache.delete(oldest.value)
+        }
+        return { entry: { ...entry }, warnings: tplWarnings }
+      }),
+    )
+    for (const item of loaded) warnings.push(...item.warnings)
+    return loaded.map((item) => item.entry)
   }
 
   private rememberBaseline(name: string, hash: string, document: WorkflowDocument): void {

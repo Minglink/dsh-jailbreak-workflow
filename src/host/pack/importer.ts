@@ -271,7 +271,15 @@ export async function inspectPack(
   if (!zip.ok) return zip
   const opened = openPack(zip.result)
   if (!opened.ok) return opened
-  const { manifest } = opened.result
+  return inspectOpenedPack(deps, request, opened.result)
+}
+
+async function inspectOpenedPack(
+  deps: PackDeps,
+  request: { token: string; cwd?: string; session?: string },
+  opened: OpenedPack,
+): Promise<Outcome<PackImportPreview>> {
+  const { manifest } = opened
   const name = manifest.workflow.name
 
   const takenNames = await takenWorkflowNames(deps.dataDir)
@@ -475,12 +483,12 @@ export async function applyPack(
   deps: PackDeps,
   request: PackApplyRequest,
 ): Promise<Outcome<PackApplyResponse>> {
-  const preview = await inspectPack(deps, request)
-  if (!preview.ok) return preview
   const zip = await readIn(deps.dataDir, request.token)
   if (!zip.ok) return zip
   const opened = openPack(zip.result)
   if (!opened.ok) return opened
+  const preview = await inspectOpenedPack(deps, request, opened.result)
+  if (!preview.ok) return preview
   const { manifest, versions, entries } = opened.result
   // 只能并入同名的那张（预览里比的就是它）。
   if (

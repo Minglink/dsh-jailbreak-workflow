@@ -162,8 +162,11 @@ export interface StepResources {
   reads: { resource: ResourceNode; edge: WorkflowEdge }[]
 }
 
-export function stepResources(document: WorkflowDocument, stepId: string): StepResources {
-  const nodes = nodeIndex(document)
+export function stepResources(
+  document: WorkflowDocument,
+  stepId: string,
+  nodes: ReadonlyMap<string, WorkflowNode> = nodeIndex(document),
+): StepResources {
   const key = idKey(stepId)
   const out: StepResources = { writes: [], reads: [] }
   for (const edge of document.edges) {

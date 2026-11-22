@@ -14,6 +14,7 @@
  * @module @minglink/dsh-jailbreak-workflow/client/model/nudge
  */
 
+import { gridOf } from './boxGrid.ts'
 import type { Rect } from './route.ts'
 
 export interface Track {
@@ -202,7 +203,13 @@ function spread(
 function channel(segment: Segment, boxes: readonly Rect[], axis: 'h' | 'v'): [number, number] {
   let from = -Infinity
   let to = Infinity
-  for (const box of boxes) {
+  if (segment.lo + 1 >= segment.hi - 1) return [from, to]
+  const grid = gridOf(boxes)
+  const candidates =
+    axis === 'h'
+      ? grid.acrossColumns(segment.lo + 1, segment.hi - 1)
+      : grid.acrossRows(segment.lo + 1, segment.hi - 1)
+  for (const box of candidates) {
     const [start, size, cross, depth] =
       axis === 'h' ? [box.x, box.w, box.y, box.h] : [box.y, box.h, box.x, box.w]
     if (start + size <= segment.lo + 1 || start >= segment.hi - 1) continue

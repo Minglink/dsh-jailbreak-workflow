@@ -32,7 +32,7 @@
   ],
   "engines": {
     "node": ">=22",
-    "dsh": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0"
+    "dsh": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0"
   },
   "packageManager": "pnpm@11.21.0",
   "main": "lib/index.mjs",
@@ -76,6 +76,7 @@
       "inject": [
         "@deepseek-ai/dsh-client-connection",
         "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-renderer",
         "@deepseek-ai/dsh-client-ui-slots"
       ]
     },
@@ -85,12 +86,12 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.4",
-    "@deepseek-ai/dsh-agent": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0",
-    "@deepseek-ai/dsh-client-connection": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0",
-    "@deepseek-ai/dsh-home-paths": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0",
-    "@deepseek-ai/dsh-llm": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0",
-    "@deepseek-ai/dsh-settings": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0",
-    "@deepseek-ai/dsh-tools": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0"
+    "@deepseek-ai/dsh-agent": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0",
+    "@deepseek-ai/dsh-client-connection": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0",
+    "@deepseek-ai/dsh-home-paths": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0",
+    "@deepseek-ai/dsh-llm": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0",
+    "@deepseek-ai/dsh-settings": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0",
+    "@deepseek-ai/dsh-tools": ">=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0"
   },
   "dependencies": {
     "@deepseek-ai/schemastery": "^3.18.4",

@@ -15,13 +15,14 @@
 
 import type { Dirent } from 'node:fs'
 import { readdir } from 'node:fs/promises'
-import { readDocument, writeDocument } from '../../shared/model.ts'
+import { normalizeDocument, writeDocument } from '../../shared/model.ts'
 import type { WorkflowDocument } from '../../shared/types.ts'
 import { readFileText } from './atomic.ts'
 import { isAbsentError, versionFile, versionsDir } from './paths.ts'
 
 const FORMAT = 1
 const FILE_NAME = /^([1-9]\d{0,8})\.json$/i
+const MAX_VERSION_CACHE = 512
 
 /** 读出来的一个版本；文件坏了 `document` 是 `null`。 */
 export interface StoredVersion {
@@ -31,6 +32,9 @@ export interface StoredVersion {
   autoBefore?: number
   document: WorkflowDocument | null
 }
+
+const versionCache = new Map<string, { text: string; version: StoredVersion }>()
+const contentKeyCache = new WeakMap<WorkflowDocument, string>()
 
 /** 版本文件的规范写法。 */
 export function versionText(version: StoredVersion & { document: WorkflowDocument }): string {
@@ -57,8 +61,7 @@ export function parseVersion(text: string, n: number): StoredVersion {
     return { n, createdAt: 0, note: '', document: null }
   }
   const record = raw as Record<string, unknown>
-  const parsed =
-    record.document === undefined ? null : readDocument(JSON.stringify(record.document)).document
+  const parsed = record.document === undefined ? null : normalizeDocument(record.document).document
   const autoBefore = record.autoBefore
   return {
     n,
@@ -67,6 +70,24 @@ export function parseVersion(text: string, n: number): StoredVersion {
     ...(typeof autoBefore === 'number' && Number.isInteger(autoBefore) ? { autoBefore } : {}),
     document: parsed,
   }
+}
+
+function readCachedVersion(file: string, text: string, n: number): StoredVersion {
+  const cached = versionCache.get(file)
+  if (cached !== undefined && cached.text === text && cached.version.n === n) {
+    versionCache.delete(file)
+    versionCache.set(file, cached)
+    return cached.version
+  }
+  const version = parseVersion(text, n)
+  versionCache.delete(file)
+  versionCache.set(file, { text, version })
+  while (versionCache.size > MAX_VERSION_CACHE) {
+    const oldest = versionCache.keys().next()
+    if (oldest.done) break
+    versionCache.delete(oldest.value)
+  }
+  return version
 }
 
 /** 这个工作流存下的全部版本，新的在前。目录不在 = 没有版本。 */
@@ -78,15 +99,21 @@ export async function readVersions(dataDir: string, name: string): Promise<Store
     if (isAbsentError(error)) return []
     throw error
   }
-  const versions: StoredVersion[] = []
+  const numbers: number[] = []
   for (const entry of entries) {
     const match = entry.isFile() ? FILE_NAME.exec(entry.name) : null
-    if (match === null) continue
-    const n = Number(match[1])
-    const text = await readFileText(versionFile(dataDir, name, n))
-    if (text !== null) versions.push(parseVersion(text, n))
+    if (match !== null) numbers.push(Number(match[1]))
   }
-  return versions.sort((a, b) => b.n - a.n)
+  const loaded = await Promise.all(
+    numbers.map(async (n) => {
+      const file = versionFile(dataDir, name, n)
+      const text = await readFileText(file)
+      return text === null ? null : readCachedVersion(file, text, n)
+    }),
+  )
+  return loaded
+    .filter((version): version is StoredVersion => version !== null)
+    .sort((a, b) => b.n - a.n)
 }
 
 /** 只数个数（列工作流时用，不读内容）。 */
@@ -104,5 +131,9 @@ export async function countVersions(dataDir: string, name: string): Promise<numb
  * 卡片位置算（挪了卡片就是另一个样子，切换时会看到「布局」那一行）。
  */
 export function contentKey(document: WorkflowDocument): string {
-  return writeDocument({ ...document, viewport: { x: 0, y: 0, zoom: 1 } })
+  const cached = contentKeyCache.get(document)
+  if (cached !== undefined) return cached
+  const computed = writeDocument({ ...document, viewport: { x: 0, y: 0, zoom: 1 } })
+  contentKeyCache.set(document, computed)
+  return computed
 }

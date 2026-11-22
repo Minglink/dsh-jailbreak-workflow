@@ -212,9 +212,12 @@ function safeExt(full: string): string {
   return /^\.[a-z0-9]{1,12}$/u.test(ext) ? ext : ''
 }
 
+const MAX_HISTORY_CACHE = 128
+
 /** 一个实例的各版：读、存、删。写都在实例的写入队列里（状态、用户改动同一条队），这里不另加锁。 */
 export class RunHistory {
   private readonly dataDir: () => string
+  private readonly cache = new Map<string, { text: string; index: HistoryIndex }>()
 
   constructor(dataDir: () => string) {
     this.dataDir = dataDir
@@ -225,7 +228,26 @@ export class RunHistory {
   }
 
   private async read(id: string): Promise<HistoryIndex> {
-    return parseIndex(await readFileText(join(this.dir(id), INDEX_FILE)).catch(() => null))
+    const text = await readFileText(join(this.dir(id), INDEX_FILE)).catch(() => null)
+    if (text === null) {
+      this.cache.delete(id)
+      return emptyIndex()
+    }
+    const cached = this.cache.get(id)
+    if (cached !== undefined && cached.text === text) return cached.index
+    const index = parseIndex(text)
+    this.remember(id, text, index)
+    return index
+  }
+
+  private remember(id: string, text: string, index: HistoryIndex): void {
+    this.cache.delete(id)
+    this.cache.set(id, { text, index })
+    while (this.cache.size > MAX_HISTORY_CACHE) {
+      const oldest = this.cache.keys().next()
+      if (oldest.done) break
+      this.cache.delete(oldest.value)
+    }
   }
 
   /** 每项存了几版、变过几次（`run/stat` 用）。 */
@@ -274,7 +296,9 @@ export class RunHistory {
   ): Promise<void> {
     if (plan.captures.length === 0 && plan.verdicts.length === 0) return
     const dir = this.dir(id)
+    this.cache.delete(id)
     const index = await this.read(id)
+    this.cache.delete(id)
     let changed = false
     for (const capture of plan.captures) {
       const key = historyKey(capture.node, capture.item)
@@ -317,7 +341,9 @@ export class RunHistory {
     }
     if (!changed) return
     trimToBudget(index)
-    await writeFileAtomic(join(dir, INDEX_FILE), `${JSON.stringify(index)}\n`)
+    const serialized = `${JSON.stringify(index)}\n`
+    await writeFileAtomic(join(dir, INDEX_FILE), serialized)
+    this.remember(id, serialized, index)
     await this.sweep(dir, index)
   }
 
@@ -372,6 +398,7 @@ export class RunHistory {
 
   /** 删掉一个实例存的所有版本。 */
   async clear(id: string): Promise<void> {
+    this.cache.delete(id)
     await removeTree(this.dir(id))
   }
 }

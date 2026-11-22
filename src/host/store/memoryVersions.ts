@@ -103,6 +103,27 @@ function parseVersion(text: string, n: number): StoredMemoryVersion {
   }
 }
 
+const MAX_MEM_VERSION_CACHE = 512
+const memVersionCache = new Map<string, { text: string; version: StoredMemoryVersion }>()
+
+function readCachedMemVersion(file: string, text: string, n: number): StoredMemoryVersion {
+  const cached = memVersionCache.get(file)
+  if (cached !== undefined && cached.text === text && cached.version.n === n) {
+    memVersionCache.delete(file)
+    memVersionCache.set(file, cached)
+    return cached.version
+  }
+  const version = parseVersion(text, n)
+  memVersionCache.delete(file)
+  memVersionCache.set(file, { text, version })
+  while (memVersionCache.size > MAX_MEM_VERSION_CACHE) {
+    const oldest = memVersionCache.keys().next()
+    if (oldest.done) break
+    memVersionCache.delete(oldest.value)
+  }
+  return version
+}
+
 /** 一条记忆的全部版本，新的在前。 */
 async function readVersions(dataDir: string, id: string): Promise<StoredMemoryVersion[]> {
   const dir = memoryVersionsDir(dataDir, id)
@@ -112,15 +133,21 @@ async function readVersions(dataDir: string, id: string): Promise<StoredMemoryVe
   } catch {
     return []
   }
-  const versions: StoredMemoryVersion[] = []
+  const items: { name: string; n: number }[] = []
   for (const name of names) {
     const match = FILE_NAME.exec(name)
-    if (match === null) continue
-    const n = Number(match[1])
-    const text = await readFileText(join(dir, name))
-    if (text !== null) versions.push(parseVersion(text, n))
+    if (match !== null) items.push({ name, n: Number(match[1]) })
   }
-  return versions.sort((a, b) => b.n - a.n)
+  const loaded = await Promise.all(
+    items.map(async ({ name, n }) => {
+      const file = join(dir, name)
+      const text = await readFileText(file)
+      return text === null ? null : readCachedMemVersion(file, text, n)
+    }),
+  )
+  return loaded
+    .filter((version): version is StoredMemoryVersion => version !== null)
+    .sort((a, b) => b.n - a.n)
 }
 
 /** 现在的文件夹：树和内容指纹。文件夹还没有（模型还没写过）就是空树。超了上限回 `over`。 */

@@ -405,7 +405,11 @@ export function sameHandoff(
   a: Handoff | false | undefined,
   b: Handoff | false | undefined,
 ): boolean {
-  return JSON.stringify(canonicalHandoff(a) ?? null) === JSON.stringify(canonicalHandoff(b) ?? null)
+  const ca = canonicalHandoff(a)
+  const cb = canonicalHandoff(b)
+  if (ca === cb) return true
+  if (ca === undefined || ca === false || cb === undefined || cb === false) return false
+  return ca.note === cb.note
 }
 
 /** 两条边的 `data` 内容是否相同（条件、标签、交接、写入方式）。 */

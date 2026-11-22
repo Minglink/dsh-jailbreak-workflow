@@ -37,7 +37,7 @@ interface Observable<T> {
 
 interface InputSnapshot {
   draft: string
-  phase: 'plain' | 'adjudicating' | 'claimed' | 'submitting'
+  phase: 'plain' | 'adjudicating' | 'claimed' | 'submitting' | 'sending'
 }
 
 interface SessionInput {

@@ -143,10 +143,14 @@ export async function memoryUsage(
 ): Promise<Map<string, string[]>> {
   const usage = new Map<string, string[]>()
   const listed = await repository.list()
-  for (const workflow of listed.workflows) {
-    const loaded = await repository.load(workflow.name)
-    if (loaded.document === null) continue
-    for (const id of memoryRefs(loaded.document)) {
+  const loaded = await Promise.all(
+    listed.workflows.map((workflow) => repository.load(workflow.name)),
+  )
+  for (let index = 0; index < listed.workflows.length; index += 1) {
+    const workflow = listed.workflows[index]
+    const doc = loaded[index]?.document
+    if (workflow === undefined || doc === null || doc === undefined) continue
+    for (const id of memoryRefs(doc)) {
       const key = idKey(id)
       usage.set(key, [...(usage.get(key) ?? []), workflow.name])
     }
@@ -163,12 +167,13 @@ async function folderStats(
   if (tree === null || !tree.dir) return { files: 0, bytes: 0, updatedAt: null }
   let updatedAt: number | null = null
   for (const file of tree.files) {
-    try {
-      const info = await stat(file.full)
-      if (updatedAt === null || info.mtimeMs > updatedAt) updatedAt = info.mtimeMs
-    } catch {
-      // 走完树之后被删了：不算。
-    }
+    const mtimeMs =
+      file.mtimeMs ??
+      (await stat(file.full).then(
+        (info) => info.mtimeMs,
+        () => null,
+      ))
+    if (mtimeMs !== null && (updatedAt === null || mtimeMs > updatedAt)) updatedAt = mtimeMs
   }
   return { files: tree.files.length, bytes: tree.bytes, updatedAt }
 }
@@ -211,12 +216,9 @@ export async function memoryEntry(deps: MemoryDeps, id: string): Promise<Outcome
 
 /** 库里的全部记忆，按名称排。 */
 export async function listMemories(deps: MemoryDeps): Promise<MemoryEntry[]> {
-  const usage = await memoryUsage(deps.repository)
-  const entries: MemoryEntry[] = []
-  for (const id of await memoryIds(deps.dataDir)) {
-    const entry = await entryOf(deps.dataDir, id, usage)
-    if (entry !== null) entries.push(entry)
-  }
+  const [usage, ids] = await Promise.all([memoryUsage(deps.repository), memoryIds(deps.dataDir)])
+  const loaded = await Promise.all(ids.map((id) => entryOf(deps.dataDir, id, usage)))
+  const entries = loaded.filter((entry): entry is MemoryEntry => entry !== null)
   const title = (entry: MemoryEntry): string => (entry.name.trim() === '' ? entry.id : entry.name)
   return entries.sort((a, b) => title(a).localeCompare(title(b)) || a.id.localeCompare(b.id))
 }

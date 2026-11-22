@@ -2147,11 +2147,29 @@ export function Canvas(props: CanvasProps): React.JSX.Element {
     [],
   )
 
-  /** 每个资源谁写、谁读（悬停资源卡时据此标角色）。 */
-  const files = useMemo(
-    () => resourceGraph({ nodes: doc.nodes, edges: doc.edges, viewport: doc.viewport }),
-    [doc.nodes, doc.edges],
-  )
+  /** 每个资源谁写、谁读（悬停资源卡时据此标角色）。改步骤提示词、名称、描述或挪卡片时不重算。 */
+  const filesCache = useRef<{ key: string; files: ReturnType<typeof resourceGraph> } | null>(null)
+  const files = useMemo(() => {
+    const nodes = doc.nodes
+      .map((node) => {
+        const mem = isResource(node) ? memoryOf(node.data) : undefined
+        return `${node.id}~${node.type}~${mem === undefined ? '' : `${mem.type}:${mem.memory}`}`
+      })
+      .join(';')
+    const edges = doc.edges
+      .map(
+        (edge) =>
+          `${edge.id}~${edge.source}~${edge.target}~${edge.data?.update === true ? 'u' : ''}`,
+      )
+      .join(';')
+    const key = `${nodes}#${edges}`
+    if (filesCache.current !== null && filesCache.current.key === key) {
+      return filesCache.current.files
+    }
+    const computed = resourceGraph({ nodes: doc.nodes, edges: doc.edges, viewport: doc.viewport })
+    filesCache.current = { key, files: computed }
+    return computed
+  }, [doc.nodes, doc.edges, doc.viewport])
 
   /** 开着记忆的步骤（写着一张记忆卡的那些，规范大小写）。 */
   const memorySteps = useMemo(() => {

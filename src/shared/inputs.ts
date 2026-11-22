@@ -13,7 +13,14 @@
 import { byId } from './graph.ts'
 import { idKey, isInput, readAnswer } from './model.ts'
 import { edgeKind, nodeIndex } from './resources.ts'
-import type { InputAnswer, InputData, InputKind, InputNode, WorkflowDocument } from './types.ts'
+import type {
+  InputAnswer,
+  InputData,
+  InputKind,
+  InputNode,
+  WorkflowDocument,
+  WorkflowNode,
+} from './types.ts'
 
 /** 交互方式（缺省 = 单行文字）。 */
 export function inputKind(data: InputData): InputKind {
@@ -33,8 +40,11 @@ export function orderedInputs(document: WorkflowDocument): InputNode[] {
 }
 
 /** 回答交给哪些步骤（按 id 码位序）；空 = 交给整个工作流。 */
-export function inputReaders(document: WorkflowDocument, inputId: string): string[] {
-  const nodes = nodeIndex(document)
+export function inputReaders(
+  document: WorkflowDocument,
+  inputId: string,
+  nodes: ReadonlyMap<string, WorkflowNode> = nodeIndex(document),
+): string[] {
   const key = idKey(inputId)
   const readers = new Set<string>()
   for (const edge of document.edges) {
@@ -46,8 +56,11 @@ export function inputReaders(document: WorkflowDocument, inputId: string): strin
 }
 
 /** 一个步骤用到的输入节点（按阅读顺序）。 */
-export function stepInputs(document: WorkflowDocument, stepId: string): InputNode[] {
-  const nodes = nodeIndex(document)
+export function stepInputs(
+  document: WorkflowDocument,
+  stepId: string,
+  nodes: ReadonlyMap<string, WorkflowNode> = nodeIndex(document),
+): InputNode[] {
   const key = idKey(stepId)
   const used = new Set<string>()
   for (const edge of document.edges) {

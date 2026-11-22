@@ -37,21 +37,25 @@ async function treeSize(dir: string): Promise<{ files: number; bytes: number }> 
   } catch {
     return { files: 0, bytes: 0 }
   }
+  const parts = await Promise.all(
+    entries.map(async (entry) => {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) return treeSize(full)
+      if (entry.isFile()) {
+        const bytes = await stat(full).then(
+          (info) => info.size,
+          () => 0,
+        )
+        return { files: 1, bytes }
+      }
+      return { files: 0, bytes: 0 }
+    }),
+  )
   let files = 0
   let bytes = 0
-  for (const entry of entries) {
-    const full = join(dir, entry.name)
-    if (entry.isDirectory()) {
-      const inner = await treeSize(full)
-      files += inner.files
-      bytes += inner.bytes
-    } else if (entry.isFile()) {
-      files += 1
-      bytes += await stat(full).then(
-        (info) => info.size,
-        () => 0,
-      )
-    }
+  for (const part of parts) {
+    files += part.files
+    bytes += part.bytes
   }
   return { files, bytes }
 }
@@ -72,12 +76,13 @@ export async function storageAction(
     cleared = (await treeSize(dispatchRoot(dataDir))).files
     await removeTree(dispatchRoot(dataDir))
   }
+  let all = await runs.list(undefined, true)
   if (action === 'clearFinished') {
-    const finished = (await runs.list(undefined, true)).filter(
-      (item) => item.status === 'done' || item.status === 'cancelled',
-    )
+    const finished = all.filter((item) => item.status === 'done' || item.status === 'cancelled')
     for (const item of finished) await runs.remove(item.id, false)
     cleared = finished.length
+    const gone = new Set(finished.map((item) => item.id))
+    all = all.filter((item) => !gone.has(item.id))
   }
   if (action === 'clearHistory') {
     cleared = 0
@@ -86,7 +91,6 @@ export async function storageAction(
       await removeTree(dir)
     }
   }
-  const all = await runs.list(undefined, true)
   const [
     workflows,
     templates,

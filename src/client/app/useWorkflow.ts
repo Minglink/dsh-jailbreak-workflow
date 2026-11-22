@@ -105,6 +105,8 @@ function writeLast(name: string | null): void {
 }
 
 function sameDocument(a: WorkflowDocument, b: WorkflowDocument): boolean {
+  if (a === b) return true
+  if (a.nodes.length !== b.nodes.length || a.edges.length !== b.edges.length) return false
   return JSON.stringify(a) === JSON.stringify(b)
 }
 
@@ -604,7 +606,30 @@ export function useWorkflow(rpc: WorkflowLiteRpc, t: T): Workflow {
     return () => window.removeEventListener('focus', onFocus)
   }, [rpc, apply, notify])
 
-  const analysis = useMemo(() => (state.doc === null ? null : analyzeGraph(state.doc)), [state.doc])
+  const analysisCache = useRef<{ key: string; analysis: GraphAnalysis } | null>(null)
+  const analysis = useMemo(() => {
+    const doc = state.doc
+    if (doc === null) {
+      analysisCache.current = null
+      return null
+    }
+    const nodes = doc.nodes.map((node) => `${node.id}~${node.type}`).join(';')
+    const edges = doc.edges
+      .map(
+        (edge) =>
+          `${edge.id}~${edge.source}~${edge.target}~${edge.data?.when ?? ''}~${
+            edge.data?.update === true ? 'u' : ''
+          }`,
+      )
+      .join(';')
+    const key = `${nodes}#${edges}`
+    if (analysisCache.current !== null && analysisCache.current.key === key) {
+      return analysisCache.current.analysis
+    }
+    const computed = analyzeGraph(doc)
+    analysisCache.current = { key, analysis: computed }
+    return computed
+  }, [state.doc])
 
   // 还没摆过的节点（模型用工具加的、或整张新图）补上坐标。补位是真实改动，会落盘。
   useEffect(() => {

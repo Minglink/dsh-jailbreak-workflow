@@ -4,9 +4,10 @@ import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-// Supported DSH line: every 0.2.0 build (rc / beta / final) or any 0.2.1+ build, nothing past 0.3.
-// DSH checks peers with `includePrerelease`, so `^` would also admit 0.3.x.
-const DSH_RANGE = '>=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.3.0-0'
+// Supported DSH line: every 0.2.0 / 0.2.1 / 0.2.2+ build (rc / beta / final), nothing past 0.3.
+// DSH checks peers with `includePrerelease`, while standard npm/pnpm peer checks require explicit
+// prerelease tuples (`0.2.0-0`, `0.2.1-0`, `0.2.2-0`) to match 0.2.x prereleases.
+const DSH_RANGE = '>=0.2.0-0 <0.2.1-0 || >=0.2.1-0 <0.2.2-0 || >=0.2.2-0 <0.3.0-0'
 const DEV_VERSION = '0.2.1-rc.2'
 const BADGE = 'DeepSeek%20Harness-0.2.x-'
 

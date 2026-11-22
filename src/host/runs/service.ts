@@ -437,6 +437,8 @@ function pinRoot(document: WorkflowDocument, id: string): WorkflowDocument {
   }
 }
 
+const MAX_RUN_CACHE = 256
+
 export class RunService {
   readonly store: InstanceStore
   /** 产出的各版（循环迭代时每一轮写成了什么样）。 */
@@ -446,6 +448,22 @@ export class RunService {
   private readonly queues = new Map<string, Promise<unknown>>()
   /** 带筛选按行读的工作线程（用到才起）。 */
   private scanner: LineScanner | null = null
+  /** 实例快照的解析记忆：同一个文件内容不重复 `JSON.parse` + 归一化。 */
+  private readonly snapshotCache = new Map<
+    string,
+    { text: string; document: WorkflowDocument | null }
+  >()
+  /** 实例状态文件的解析与校验记忆：8s/5s 轮询没改过的文件不重复跑 YAML 解析与图对照校验。 */
+  private readonly stateCache = new Map<
+    string,
+    {
+      text: string
+      planId: string
+      withDoc: boolean
+      state: RunState | null
+      issues: RunStateIssue[]
+    }
+  >()
 
   constructor(deps: RunServiceDeps) {
     this.deps = deps
@@ -713,11 +731,30 @@ export class RunService {
 
   private async snapshot(record: InstanceRecord): Promise<WorkflowDocument | null> {
     const text = await readFileText(snapshotFile(this.deps.dataDir(), record.id))
-    if (text === null) return null
-    const document = readDocument(text).document
+    if (text === null) {
+      this.snapshotCache.delete(record.id)
+      return null
+    }
+    const cached = this.snapshotCache.get(record.id)
+    if (cached !== undefined && cached.text === text) {
+      this.snapshotCache.delete(record.id)
+      this.snapshotCache.set(record.id, cached)
+      return cached.document
+    }
+    const parsed = readDocument(text).document
     // 早先的快照没定死根目录：那时没配 = 工作区根。
-    if (document === null || document.settings?.outputRoot !== undefined) return document
-    return { ...document, settings: { ...document.settings, outputRoot: WORKSPACE_ROOT } }
+    const document =
+      parsed === null || parsed.settings?.outputRoot !== undefined
+        ? parsed
+        : { ...parsed, settings: { ...parsed.settings, outputRoot: WORKSPACE_ROOT } }
+    this.snapshotCache.delete(record.id)
+    this.snapshotCache.set(record.id, { text, document })
+    while (this.snapshotCache.size > MAX_RUN_CACHE) {
+      const oldest = this.snapshotCache.keys().next()
+      if (oldest.done) break
+      this.snapshotCache.delete(oldest.value)
+    }
+    return document
   }
 
   /** 找文件用的快照：工作流目录、记忆库里的（`{workflow}/…`、`{memory}/…`）换成绝对路径（快照本身不改）。 */
@@ -776,37 +813,81 @@ export class RunService {
     try {
       mtime = (await stat(record.statePath)).mtimeMs
     } catch {
+      this.stateCache.delete(record.id)
       return { state: null, issues: [], mtime: 0, text: null }
     }
     const text = await readFileText(record.statePath)
-    if (text === null) return { state: null, issues: [], mtime: 0, text: null }
+    if (text === null) {
+      this.stateCache.delete(record.id)
+      return { state: null, issues: [], mtime: 0, text: null }
+    }
+    const withDoc = document !== undefined && document !== null
+    const cached = this.stateCache.get(record.id)
+    if (
+      cached !== undefined &&
+      cached.text === text &&
+      cached.planId === record.planId &&
+      cached.withDoc === withDoc
+    ) {
+      this.stateCache.delete(record.id)
+      this.stateCache.set(record.id, cached)
+      return { state: cached.state, issues: cached.issues, mtime, text }
+    }
     const doc = parseDocument(text)
     if (doc.errors.length > 0) {
-      return {
-        state: null,
-        issues: doc.errors.map((error) => ({
-          path: '',
-          message: `YAML 写法有误：${error.message}`,
-        })),
-        mtime,
+      const issues = doc.errors.map((error) => ({
+        path: '',
+        message: `YAML 写法有误：${error.message}`,
+      }))
+      this.rememberState(record.id, {
         text,
-      }
+        planId: record.planId,
+        withDoc,
+        state: null,
+        issues,
+      })
+      return { state: null, issues, mtime, text }
     }
-    const check = validateRunState(
-      doc.toJS(),
-      document === undefined || document === null ? undefined : graphFacts(document),
-      { instance: record.id, workflow: record.workflow, plan: record.planId },
-    )
+    const check = validateRunState(doc.toJS(), !withDoc ? undefined : graphFacts(document), {
+      instance: record.id,
+      workflow: record.workflow,
+      plan: record.planId,
+    })
+    this.rememberState(record.id, {
+      text,
+      planId: record.planId,
+      withDoc,
+      state: check.state,
+      issues: check.issues,
+    })
     return { state: check.state, issues: check.issues, mtime, text }
   }
 
-  private async summarize(
+  private rememberState(
+    id: string,
+    entry: {
+      text: string
+      planId: string
+      withDoc: boolean
+      state: RunState | null
+      issues: RunStateIssue[]
+    },
+  ): void {
+    this.stateCache.delete(id)
+    this.stateCache.set(id, entry)
+    while (this.stateCache.size > MAX_RUN_CACHE) {
+      const oldest = this.stateCache.keys().next()
+      if (oldest.done) break
+      this.stateCache.delete(oldest.value)
+    }
+  }
+
+  private summarizeLoaded(
     record: InstanceRecord,
     index: InstanceIndex,
     session: string | undefined,
-  ): Promise<InstanceSummary> {
-    // 对照快照校验，和打开实例时的结论一致（不给图就查不了 verdict 该不该写）。
-    const read = await this.readState(record, await this.snapshot(record))
+    read: { state: RunState | null; issues: RunStateIssue[]; text: string | null },
+  ): InstanceSummary {
     const base: InstanceSummary = {
       id: record.id,
       workflow: record.workflow,
@@ -836,6 +917,16 @@ export class RunService {
       total: progress.total,
       updatedAt: read.state.updatedAt,
     }
+  }
+
+  private async summarize(
+    record: InstanceRecord,
+    index: InstanceIndex,
+    session: string | undefined,
+  ): Promise<InstanceSummary> {
+    // 对照快照校验，和打开实例时的结论一致（不给图就查不了 verdict 该不该写）。
+    const read = await this.readState(record, await this.snapshot(record))
+    return this.summarizeLoaded(record, index, session, read)
   }
 
   /** 列实例：`all` 为假时只列 `session` 的。新的在前。 */
@@ -899,7 +990,7 @@ export class RunService {
     return {
       ok: true,
       result: {
-        summary: await this.summarize(record, index, session),
+        summary: this.summarizeLoaded(record, index, session, read),
         document,
         state: read.state,
         issues: read.text === null ? [] : read.issues,
@@ -1208,6 +1299,9 @@ export class RunService {
       return found
     })
     if (record === null) return fail('not_found', `实例 ${id} 不存在`)
+    this.snapshotCache.delete(id)
+    this.stateCache.delete(id)
+    this.history.clear(id).catch(() => {})
     await removeTree(runDir(this.deps.dataDir(), id))
     if (withState) {
       // 状态与任务描述一起删；产出（out/）是用户要的东西，留着。

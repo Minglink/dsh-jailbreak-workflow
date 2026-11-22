@@ -139,6 +139,14 @@ function parseIndex(text: string): InstanceIndex | null {
   return { version: 1, instances, current }
 }
 
+function cloneIndex(index: InstanceIndex): InstanceIndex {
+  return {
+    version: 1,
+    instances: index.instances.map((record) => ({ ...record })),
+    current: { ...index.current },
+  }
+}
+
 /**
  * 实例索引的读写。写一律走 {@link update}：进程内串行（读 → 改 → 原子写），
  * 不会有两次修改互相覆盖。
@@ -146,6 +154,7 @@ function parseIndex(text: string): InstanceIndex | null {
 export class InstanceStore {
   private chain: Promise<unknown> = Promise.resolve()
   private readonly dataDir: () => string
+  private cache: { file: string; text: string; index: InstanceIndex } | null = null
 
   constructor(dataDir: () => string) {
     this.dataDir = dataDir
@@ -157,22 +166,37 @@ export class InstanceStore {
 
   /** 读索引。文件不在 = 空；解析不了就把它挪到一边（`instances.json.broken-<时间>`）再当空的。 */
   async read(): Promise<InstanceIndex> {
-    const text = await readFileText(this.file)
-    if (text === null) return emptyIndex()
+    const file = this.file
+    const text = await readFileText(file)
+    if (text === null) {
+      this.cache = null
+      return emptyIndex()
+    }
+    if (this.cache !== null && this.cache.file === file && this.cache.text === text) {
+      return cloneIndex(this.cache.index)
+    }
     const index = parseIndex(text)
-    if (index !== null) return index
-    await renamePath(this.file, `${this.file}.broken-${Date.now()}`).catch(() => {})
+    if (index !== null) {
+      this.cache = { file, text, index }
+      return cloneIndex(index)
+    }
+    this.cache = null
+    await renamePath(file, `${file}.broken-${Date.now()}`).catch(() => {})
     return emptyIndex()
   }
 
   /** 在写锁里读 → 改 → 写回。`change` 返回 `false` 表示没改，不写盘。 */
   update<T>(change: (index: InstanceIndex) => T | Promise<T>): Promise<T> {
     const run = this.chain.then(async () => {
+      const file = this.file
       const index = await this.read()
-      const before = JSON.stringify(index)
+      const before = `${JSON.stringify(index, null, 2)}\n`
       const result = await change(index)
-      const after = JSON.stringify(index)
-      if (after !== before) await writeFileAtomic(this.file, `${JSON.stringify(index, null, 2)}\n`)
+      const after = `${JSON.stringify(index, null, 2)}\n`
+      if (after !== before) {
+        await writeFileAtomic(file, after)
+        this.cache = { file, text: after, index: cloneIndex(index) }
+      }
       return result
     })
     this.chain = run.catch(() => {})
