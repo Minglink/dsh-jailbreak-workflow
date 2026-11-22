@@ -44,7 +44,7 @@ Ready-made `.wflite.zip` workflow bundles live in the companion repository [Ming
 | Workflow | Scope & Research Capabilities | Scale | Bundled Skill | Download |
 |---|---|---|---|---|
 | **破甲制作 v3** | 10-stage multi-loop LLM safety & vulnerability evaluation pipeline grounded in 90+ arXiv 2024–2026 papers (guardrail/topology recon → Benign-Twin baseline → Red-Bandit/MAP-Elites callback probing → decoding/CoT/hierarchy profiling → 3D concept-cone modeling → 5-architecture synthesis → BoN/multi-turn stress testing → dual-judge CJE calibration & ablations → report → armory feedback), with `pass / fail_prompt / fail_surface` self-healing routing | 10 stages · 27 nodes / 69 edges | `jailbreak-research` (10 scripts + 6 templates) | [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) |
-| **破甲炼化 v2** | Structured red-teaming armory & WildTeaming `Mine→Compose` refinery: ingests public prompt corpora and live `transfer_back.md` feedback, synthesizes cross-family recipes, runs continuous-score validation with soft-refusal penalties, and exports `ARSENAL.md` + 5-architecture `TRANSFER-NOTES.md` | 8 stages · 22 nodes / 41 edges | `jb-distillery` (5-volume library + entry card) | [破甲炼化.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲炼化.wflite.zip) |
+| **破甲炼化 v2** | Structured red-teaming armory & WildTeaming `Mine→Compose` refinery: ingests public prompt corpora and live `transfer_back.md` feedback, synthesizes cross-family recipes, runs continuous-score validation with soft-refusal penalties, and exports `ARSENAL.md` + 5-architecture `TRANSFER-NOTES.md` | 8 stages · 22 nodes / 41 edges | `jb-distillery` (6-volume library + entry card) | [破甲炼化.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲炼化.wflite.zip) |
 | **pojia-fullflow v1** | End-to-end binary / mobile / protocol / crypto reverse-engineering workflow (requires local `dsh-pojia-toolkit` `pj_*` tools) | 10 stages · 20 nodes / 32 edges | 10 self-contained step prompts | [pojia-fullflow.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/pojia-fullflow.wflite.zip) |
 
 ## 🖼️ Workflow canvas previews
@@ -202,6 +202,10 @@ This repo is the plugin (canvas and compiler); [dsh-workflows](https://github.co
 3. **Run**: the model decides how to carry out the plan (working directly, dispatching subagents or forming a team) and reports progress back to the canvas.
 
 The plugin ships no execution engine and needs no extra service; scheduling and judgement stay with the model in your current session.
+
+## 🌐 Ecosystem Position & Dual-Repo Symbiosis
+
+Paired with [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows), this plugin forms a symbiotic **Visual Canvas Plugin + Reproducible Research Pack** architecture. While code-first CLI/SDK harnesses ([NVIDIA/garak](https://github.com/NVIDIA/garak), [microsoft/pyrit](https://github.com/microsoft/pyrit), [promptfoo/promptfoo](https://github.com/promptfoo/promptfoo), [JailbreakBench](https://github.com/JailbreakBench/jailbreakbench), [HarmBench](https://github.com/centerforaisafety/HarmBench), [EasyJailbreak](https://github.com/EasyJailbreak/EasyJailbreak)) focus on programmatic runners, `dsh-jailbreak-workflow` serves as the **visual methodology & orchestration layer** — packaging multi-loop probing, dual-judge calibration, Mine→Compose recipes, and a 6-volume distilled library into shareable `.wflite.zip` bundles (see [github-redteam-ecosystem.md](https://github.com/Minglink/dsh-workflows/blob/master/docs/research/github-redteam-ecosystem.md)).
 
 ## 💬 Open-Source Community (OpenOrigin / O-Station)
 

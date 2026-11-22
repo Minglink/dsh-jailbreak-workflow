@@ -32,7 +32,7 @@
 | 工作流 | 定位与能力 | 规模 | 内置 Skill | 下载 |
 |---|---|---|---|---|
 | **破甲制作 v3** | 依据 90+ 篇 arXiv 2024–2026 论文构建的十步多回路 LLM 漏洞与边界研究流水线（护栏/拓扑侦察 → 孪生锐度基线 → 多臂自适应回调 → 推理/CoT/层级测绘 → 三维概念锥建模 → 五套架构合成 → BoN/多轮压测 → 双裁判 CJE 校准与消融 → 报告 → 军械库回灌），含 `pass / fail_prompt / fail_surface` 三路自愈路由 | 10 步 · 27 节点 / 69 边 | `jailbreak-research`（10 脚本 + 6 模板） | [破甲制作.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲制作.wflite.zip) |
-| **破甲炼化 v2** | 公开破甲词 & 实战回灌 → WildTeaming `Mine→Compose` 机制交叉复合配方 → 连续评分尺抽锋验证 → 铸成 `ARSENAL.md` 军械库与对接「破甲制作 v3」五架构的 `TRANSFER-NOTES.md` 六类弹药表 | 8 步 · 22 节点 / 41 边 | `jb-distillery`（五卷底册 + 词条卡） | [破甲炼化.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲炼化.wflite.zip) |
+| **破甲炼化 v2** | 公开破甲词 & 实战回灌 → WildTeaming `Mine→Compose` 机制交叉复合配方 → 连续评分尺抽锋验证 → 铸成 `ARSENAL.md` 军械库与对接「破甲制作 v3」五架构的 `TRANSFER-NOTES.md` 六类弹药表 | 8 步 · 22 节点 / 41 边 | `jb-distillery`（六卷底册 + 词条卡） | [破甲炼化.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/破甲炼化.wflite.zip) |
 | **pojia-fullflow v1** | 二进制 / 移动端 / 协议 / 加密逆向全流程（需求入口 → 宿主装配 → 判断取线 → 五角色干活 → 回流自评 → 交付落库；依赖本地 `dsh-pojia-toolkit` 的 `pj_*` 工具） | 10 步 · 20 节点 / 32 边 | 10 步自足任务正文 | [pojia-fullflow.wflite.zip](https://github.com/Minglink/dsh-workflows/raw/master/workflows/pojia-fullflow.wflite.zip) |
 
 ## 🖼️ 工作流画布预览
@@ -191,6 +191,10 @@ dsh web
 3. **执行**：模型按计划自行安排执行方式（直接完成、派发子代理或组建团队），并把进度同步回画布。
 
 插件本身不包含执行引擎，也无需额外服务；调度与判断交由当前会话中的模型完成。
+
+## 🌐 双仓共生与开源红队生态定位
+
+本插件与 [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows) 组成「**可视化画布插件 + 可复现研究工作流合集**」双仓共生体系，相比代码优先的 CLI/SDK 红队工具（[NVIDIA/garak](https://github.com/NVIDIA/garak)、[microsoft/pyrit](https://github.com/microsoft/pyrit)、[promptfoo/promptfoo](https://github.com/promptfoo/promptfoo)、[JailbreakBench](https://github.com/JailbreakBench/jailbreakbench)、[HarmBench](https://github.com/centerforaisafety/HarmBench)、[EasyJailbreak](https://github.com/EasyJailbreak/EasyJailbreak)），本项目定位于**上层可视化编排与方法论沉淀层**：无需重型执行引擎，把多轮回调、双裁判校准、Mine→Compose 交叉组合与六卷军械底册打包为可共享、可版本对比的 `.wflite.zip`，同时支持在节点中直接调度上述 CLI 框架（详见 [开源生态对标档案](https://github.com/Minglink/dsh-workflows/blob/master/docs/research/github-redteam-ecosystem.md)）。
 
 ## 💬 开源社区与交流（O站 · openorigin）
 
