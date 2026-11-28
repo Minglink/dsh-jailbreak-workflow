@@ -22,7 +22,7 @@
 - Path variables: `{workflow}` resolves to `~/.dsh/workflow-lite/assets/<workflow-name>/`; `{instance}` resolves to `.workflow-lite/runs/<instance>/out`.
 
 ## Community & Forum
-- Official AI Open-Source Forum (O站 / OpenOrigin): https://openorigin.link/ (invite code: `CESFAVBR`, QQ Group: `1108766989`)
+- Official AI Open-Source Forum (O站 / OpenOrigin): https://openorigin.link/ (invite code: `CESFAVBR`, QQ Group: `1084913983`)
 
 ## Keywords
 DeepSeek Harness, dsh-workflow-lite, dsh-jailbreak-workflow, visual workflow plugin, LLM red teaming, AI safety evaluation, soft workflow, React Flow canvas, arXiv research workflows, MCP security, openorigin.

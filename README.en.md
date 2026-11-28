@@ -8,7 +8,7 @@
 
 <div align="center">
 
-[简体中文](./README.md) | **English** | [AI Index (`llms.txt`)](./llms.txt) · [Workflow Packs `dsh-workflows`](https://github.com/Minglink/dsh-workflows) · [Forum](https://openorigin.link/) (invite code `CESFAVBR`) · QQ Group `1108766989`
+[简体中文](./README.md) | **English** | [AI Index (`llms.txt`)](./llms.txt) · [Workflow Packs `dsh-workflows`](https://github.com/Minglink/dsh-workflows) · [Forum](https://openorigin.link/) (invite code `CESFAVBR`) · QQ Group `1084913983`
 
 </div>
 
@@ -222,7 +222,7 @@ Paired with [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows),
 Join **[OpenOrigin (O-Station) · AI Tech Open-Source Forum](https://openorigin.link/)** to discuss LLM safety research, red-teaming methodologies, DeepSeek Harness plugins, and custom `.wflite.zip` workflows:
 
 - **Forum**: [https://openorigin.link/](https://openorigin.link/) (invite code: `CESFAVBR`)
-- **QQ Group**: `1108766989`
+- **QQ Group**: `1084913983`
 - **Workflow Packs**: [Minglink/dsh-workflows](https://github.com/Minglink/dsh-workflows)
 
 ---

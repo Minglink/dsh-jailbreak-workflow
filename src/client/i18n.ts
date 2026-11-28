@@ -442,7 +442,7 @@ export const zh = {
   'cfg.groupModel': '模型',
   'cfg.groupCommunity': '开源社区与资源',
   'cfg.forumTitle': 'O站（openorigin）· AI 技术开源分享论坛',
-  'cfg.forumDesc': 'AI 安全研究、红队评测与开源工作流分享社区（邀请码 CESFAVBR · QQ 群 1108766989）',
+  'cfg.forumDesc': 'AI 安全研究、红队评测与开源工作流分享社区（邀请码 CESFAVBR · QQ 群 1084913983）',
   'cfg.forumAction': '访问 O 站',
   'cfg.packsTitle': '官方工作流合集（dsh-workflows）',
   'cfg.packsDesc': '破甲制作 v3 / 破甲炼化 v2 / pojia-fullflow 现成 .wflite.zip 包与 90+ 篇 arXiv 论文档案',
@@ -1957,7 +1957,7 @@ export const en: Record<LocaleKey, string> = {
   'cfg.groupCommunity': 'Community & resources',
   'cfg.forumTitle': 'OpenOrigin (O-Station) · AI Open-Source Forum',
   'cfg.forumDesc':
-    'AI safety research, red-teaming & open-source workflow community (invite: CESFAVBR · QQ: 1108766989)',
+    'AI safety research, red-teaming & open-source workflow community (invite: CESFAVBR · QQ: 1084913983)',
   'cfg.forumAction': 'Open forum',
   'cfg.packsTitle': 'Official workflow packs (dsh-workflows)',
   'cfg.packsDesc':
